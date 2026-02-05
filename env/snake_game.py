@@ -1,7 +1,7 @@
 # Logica snake
 from enum import Enum
 from typing import NamedTuple
-import random
+import random, math
 
 
 class Direction(Enum):
@@ -135,3 +135,17 @@ class SnakeGame:
             gameString += "\n "
         
         print(gameString)
+
+    def getFoodDistance(self):
+        return math.sqrt(math.pow(self.head.x - self.food.x, 2) + math.pow(self.head.y - self.food.y, 2))
+    
+    def reset(self):
+        self.head = Point(0, 0)
+        self.direction = Direction.RIGHT
+        self.score = 0
+        self.isGameOver = False
+
+        while self.body.__len__() > 0:
+            self.body.pop()
+
+        self.spawnFood()
