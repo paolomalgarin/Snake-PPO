@@ -21,6 +21,17 @@ class Direction(Enum):
             case Direction.RIGHT:
                 return Direction.LEFT
 
+    def getRightTurn(self):
+        match self:
+            case Direction.UP:
+                return Direction.RIGHT
+            case Direction.RIGHT:
+                return Direction.DOWN
+            case Direction.DOWN:
+                return Direction.LEFT
+            case Direction.LEFT:
+                return Direction.UP
+
 class Point(NamedTuple):
     x: int
     y: int
