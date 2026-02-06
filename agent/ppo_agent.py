@@ -233,6 +233,10 @@ class PPOAgent:
 
     def _preprocess_obs(self, obs):
         # Check if is already a vector
+        if isinstance(obs, np.ndarray):
+            return obs.flatten().astype(np.float32)
+
+        # Check if is not a dict    
         if not isinstance(obs, dict):
             return np.array(obs, dtype=np.float32).flatten()
 

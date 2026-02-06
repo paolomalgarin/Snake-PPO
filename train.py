@@ -34,7 +34,7 @@ if __name__ == "__main__":
     os.makedirs(os.path.join('agent', 'resoults', 'checkpoints'), exist_ok=True)
     
     env = SnakeEnv()
-    agent = PPOAgent(obs_dim=229, action_dim=3, config=config)
+    agent = PPOAgent(obs_dim=env.OBS_LENGTH, action_dim=env.ACTION_LENGTH, config=config)
 
     # Saving config
     import json
@@ -76,7 +76,7 @@ if __name__ == "__main__":
                 env.render()
 
                 stop = termin or trunc
-                time.sleep(1.3)
+                time.sleep(0.2)
                 
         # Make agent learn
         agent.ppo_update()
