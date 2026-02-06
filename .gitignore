@@ -3,3 +3,4 @@ __pycache__/
 agent/resoults/checkpoints/
 agent/resoults/config/
 agent/resoults/final_model.pth
+debug/sb3_logs/

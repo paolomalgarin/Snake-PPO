@@ -6,7 +6,7 @@ import json, os
 
 class ActorCritic(nn.Module):
 
-    def __init__(self, obs_dim, action_dim, hidden_dim=128):
+    def __init__(self, obs_dim, action_dim, hidden_dim=256):
         super().__init__()
 
         self.input_layer = nn.Linear(obs_dim, hidden_dim)
@@ -18,6 +18,8 @@ class ActorCritic(nn.Module):
 
     def forward(self, obs):
         x = self.input_layer(obs)
+        x = self.relu(x)
+        x = self.hidden_layer(x)
         x = self.relu(x)
         x = self.hidden_layer(x)
         x = self.relu(x)
@@ -33,13 +35,14 @@ class RolloutBuffer:
     def __init__(self):
         self.clear()
 
-    def store(self, obs, action, log_prob, value, reward, done):
+    def store(self, obs, action, log_prob, value, reward, done, score):
         self.obs.append(obs)
         self.actions.append(action)
         self.log_probs.append(log_prob)
         self.values.append(value)
         self.rewards.append(reward)
         self.dones.append(done)
+        self.scores.append(score)
     
     def clear(self):
         self.obs = []
@@ -48,6 +51,7 @@ class RolloutBuffer:
         self.values = []
         self.rewards = []
         self.dones = []
+        self.scores = []
 
 
 
@@ -94,7 +98,7 @@ class PPOAgent:
             
             # Memo: l'obs di SnakeEnv è un dict, devi trasformarlo in vettore
             flat_obs = self._preprocess_obs(obs)
-            self.buffer.store(flat_obs, action, log_prob, value, reward, done)
+            self.buffer.store(flat_obs, action, log_prob, value, reward, done, info['score'])
             
             obs = next_obs
             if done:

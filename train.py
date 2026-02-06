@@ -14,14 +14,16 @@ config = {
     'value_coef': 0.5,  # value loss coefficient
     'entropy_coef': 0.01
 }
-EPOCHS = 2000  # Training epochs
+EPOCHS = 5000  # Training epochs
 SAVING_FREQUENCY = 500  # Interval between model saves
-VISUALIZE_FREQUENCY = 50  # Interval between games (played by the model) shown
-BUFFER_SIZE = 2048  # Number of stepls the model plays before learning
+VISUALIZE_FREQUENCY = 100  # Interval between games (played by the model) shown
+BUFFER_SIZE = 1024  # Number of stepls the model plays before learning
 
 log_data = {
     'episodes': [],
     'rewards': [],
+    'avg_rewards': [],
+    'avg_scores': [],
     'steps': [],
     'avg_values': []
 }
@@ -50,15 +52,20 @@ if __name__ == "__main__":
 
         # Calculate episode stats
         total_reward = sum(buffer.rewards)
+        avg_reward = sum(buffer.rewards) / len(buffer.rewards) if buffer.rewards else 0
+        avg_score = sum(buffer.scores) / len(buffer.scores) if buffer.values else 0
         avg_value = sum(buffer.values) / len(buffer.values) if buffer.values else 0
         
         print(f"Total reward: {total_reward:.2f}")
-        print(f"Average value: {avg_value:.2f}")
+        print(f"Average reward: {avg_reward:.2f}")
+        print(f"Average score: {avg_score:.2f}")
         print(f"Steps collected: {len(buffer.rewards)}")
 
         # Save episode logs
         log_data['episodes'].append(episode)
         log_data['rewards'].append(total_reward)
+        log_data['avg_rewards'].append(avg_reward)
+        log_data['avg_scores'].append(avg_score)
         log_data['steps'].append(len(buffer.rewards))
         log_data['avg_values'].append(avg_value)
 
