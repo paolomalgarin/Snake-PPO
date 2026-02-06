@@ -2,7 +2,7 @@
 
 from gymnasium import Env, spaces
 import numpy as np
-from snake_game import SnakeGame, Point, Direction
+from .snake_game import SnakeGame, Point, Direction
 
 
 class SnakeEnv(Env):
@@ -10,7 +10,7 @@ class SnakeEnv(Env):
     def __init__(self):
         self.game = SnakeGame()
         self.action_space = spaces.Discrete(3) # 3 actions: move forward, turn right, turn left
-        self.observation_space = spaces.Box({
+        self.observation_space = spaces.Dict({
             "grid": spaces.Box(
                 # grid with 0 = empty squares, 1 = snake body, 2 = snake head, 3 = food
                 low=0,

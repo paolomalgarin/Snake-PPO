@@ -1,2 +1,5 @@
 __pycache__/
 .venv/
+agent/resoults/checkpoints/
+agent/resoults/config/
+agent/resoults/final_model.pth

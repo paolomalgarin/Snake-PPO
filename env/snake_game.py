@@ -46,6 +46,7 @@ class SnakeGame:
         self.head = Point(0, 0)
         self.body = []
         self.food = None
+        self.spawnFood()
 
         self.direction = Direction.RIGHT
 
