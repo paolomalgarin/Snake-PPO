@@ -4,12 +4,7 @@
 import gymnasium as gym
 import os, time, sys
 from pathlib import Path
-
-# Adding the 'agent' dir to path
-env_path = Path(__file__).parent.parent / 'agent'
-sys.path.insert(0, str(env_path))
-
-from ppo_agent import PPOAgent
+from agent.ppo_agent import PPOAgent
 
 
 # ================ CONFIGS ================

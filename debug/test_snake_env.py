@@ -8,12 +8,7 @@ from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import EvalCallback, CheckpointCallback
 from stable_baselines3.common.monitor import Monitor
-
-# Adding the 'agent' dir to path
-env_path = Path(__file__).parent.parent / 'env'
-sys.path.insert(0, str(env_path))
-
-from snake_env import SnakeEnv
+from env.snake_env import SnakeEnv
 
 # ================ CONFIGS ================
 config = {

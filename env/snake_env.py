@@ -2,7 +2,7 @@
 
 from gymnasium import Env, spaces
 import numpy as np
-from .snake_game import SnakeGame, Point, Direction
+from env.snake_game import SnakeGame, Point, Direction
 
 
 class SnakeEnv(Env):

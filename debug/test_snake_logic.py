@@ -4,12 +4,7 @@
 from pathlib import Path
 import sys
 import argparse
-
-# Aggiungo la directory 'env' al path
-env_path = Path(__file__).parent.parent / 'env'
-sys.path.insert(0, str(env_path))
-
-from snake_game import SnakeGame, Direction
+from env.snake_game import SnakeGame, Direction
 
 
 if __name__ == "__main__":
