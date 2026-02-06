@@ -20,7 +20,7 @@ class SnakeEnv(Env):
             ),
             "direction": spaces.Discrete(4)  # 0: UP, 1: DOWN, 2: LEFT, 3: RIGHT
         })
-        self.max_steps = self.game.gridHeight * self.game.gridWidth
+        self.max_steps = self.game.gridHeight * self.game.gridWidth * 10
         self.prev_score = self.game.score
         self.prev_food_distance = self.game.getFoodDistance()
     
@@ -29,7 +29,7 @@ class SnakeEnv(Env):
         self.steps = 0
         self.prev_score = self.game.score
         self.prev_food_distance = self.game.getFoodDistance()
-        self.max_steps = self.game.gridHeight * self.game.gridWidth
+        self.max_steps = self.game.gridHeight * self.game.gridWidth * 10
 
         obs = self._get_obs()
         info = {}
@@ -110,7 +110,6 @@ class SnakeEnv(Env):
         
         # +10 if eats food (and add more steps)
         if self.game.score > self.prev_score:
-            self.max_steps = self.steps +  self.game.gridHeight * self.game.gridWidth
             self.prev_score = self.game.score
             reward += 10
 

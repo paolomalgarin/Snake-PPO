@@ -66,6 +66,7 @@ if __name__ == "__main__":
         if episode % SAVING_FREQUENCY == 0 and episode != EPOCHS:
             agent.save(path='agent/resoults/checkpoints', model_name=f'checkpoint_{episode}.pth')
         
+        # Visualize play
         if episode % VISUALIZE_FREQUENCY == 0:
             env.reset()
             stop = False
@@ -76,6 +77,9 @@ if __name__ == "__main__":
 
                 stop = termin or trunc
                 time.sleep(1.3)
+                
+        # Make agent learn
+        agent.ppo_update()
             
 
     # Saving final model

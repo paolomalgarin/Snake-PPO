@@ -66,7 +66,7 @@ class PPOAgent:
         }
         
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = ActorCritic(obs_dim, action_dim).to(self.device)
+        self.model: ActorCritic = ActorCritic(obs_dim, action_dim).to(self.device)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config['lr'])
         self.buffer = RolloutBuffer()
 
@@ -104,9 +104,9 @@ class PPOAgent:
 
     def compute_gae(self):
         #Calcola i GAE (Generalized Advantage Estimation)
-        rewards = torch.tensor(self.buffer.rewards)
-        values = torch.tensor(self.buffer.values)
-        dones = torch.tensor(self.buffer.dones)
+        rewards = torch.tensor(self.buffer.rewards, dtype=torch.float32)
+        values = torch.tensor(self.buffer.values, dtype=torch.float32)
+        dones = torch.tensor(self.buffer.dones, dtype=torch.float32)
         
         advantages = torch.zeros_like(rewards)
         last_advantage = 0
@@ -128,10 +128,10 @@ class PPOAgent:
     def ppo_update(self):
         # Updates the policy using the ppo algorithm
         # Prepara dati
-        obs = torch.tensor(self.buffer.obs)
-        actions = torch.tensor(self.buffer.actions)
-        old_log_probs = torch.tensor(self.buffer.log_probs)
-        old_values = torch.tensor(self.buffer.values)
+        obs = torch.FloatTensor(np.array(self.buffer.obs))
+        actions = torch.tensor(self.buffer.actions, dtype=torch.long)
+        old_log_probs = torch.tensor(self.buffer.log_probs, dtype=torch.float32)
+        old_values = torch.tensor(self.buffer.values, dtype=torch.float32)
         
         # Calcola GAE
         advantages, returns = self.compute_gae()
@@ -231,9 +231,13 @@ class PPOAgent:
             return False
 
 
-    def _preprocess_obs(self, obs_dict):
-        """Converti dict observation in vettore"""
-        grid = obs_dict["grid"].flatten() / 3.0  # Normalizza 0-1
+    def _preprocess_obs(self, obs):
+        # Check if is already a vector
+        if not isinstance(obs, dict):
+            return np.array(obs, dtype=np.float32).flatten()
+
+        # Convert dict observations in vector
+        grid = obs["grid"].flatten() / 3.0  # Normalizza 0-1
         direction_onehot = np.zeros(4)
-        direction_onehot[obs_dict["direction"]] = 1
+        direction_onehot[obs["direction"]] = 1
         return np.concatenate([grid, direction_onehot])
