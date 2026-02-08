@@ -74,7 +74,7 @@ class SnakeEnv(Env):
         pass
 
     def _get_obs(self):
-        grid = np.zeros((self.OBS_LENGTH), dtype=np.float32)
+        grid = np.zeros((self.OBS_LENGTH,), dtype=np.float32)
         
         gridLength = self.game.gridWidth * self.game.gridHeight
         bodyGridStart = 0
@@ -87,11 +87,11 @@ class SnakeEnv(Env):
                 currentPoint = Point(col, row)
 
                 if(currentPoint in self.game.body):
-                    grid[bodyGridStart + row * self.game.gridWidth + col] = 1
+                    grid[bodyGridStart + row * self.game.gridWidth + col] = 1.0
                 elif(currentPoint == self.game.head):
-                    grid[headGridStart + row * self.game.gridWidth + col] = 1
+                    grid[headGridStart + row * self.game.gridWidth + col] = 1.0
                 elif(currentPoint == self.game.food):
-                    grid[foodGridStart + row * self.game.gridWidth + col] = 1
+                    grid[foodGridStart + row * self.game.gridWidth + col] = 1.0
             
             
         direction_mapping = {
@@ -100,7 +100,7 @@ class SnakeEnv(Env):
             Direction.LEFT: 2,
             Direction.RIGHT: 3
         }
-        grid[directionStart + direction_mapping[self.game.direction]] = 1
+        grid[directionStart + direction_mapping[self.game.direction]] = 1.0
         
         return grid
     
@@ -108,23 +108,35 @@ class SnakeEnv(Env):
         reward = 0
 
         # -0.01 for each step to promote faster game
-        reward -= 0.01
+        # reward -= 0.01
         
         # +10 if eats food (and add more steps)
         if self.game.score > self.prev_score:
             self.prev_score = self.game.score
-            reward += 10
+            reward += 4
 
         # +0.1 if gets closer to food, -0.1 if gets furder from food
         new_food_distance = self.game.getFoodDistance()
         if(new_food_distance < self.prev_food_distance):
-            reward += 0.1
-        else: 
-            reward -= 0.1
+            reward += 0.01
+        # else: 
+        #     reward -= 0.1
         self.prev_food_distance = new_food_distance
 
         # -10 if dies
         if self.game.isGameOver:
-            reward -= 10
+            reward -= 1
         
         return float(reward)
+    
+
+    def _print_obs(self, obs):
+        print("OBSERVATIONS:")
+        for i in range(3):
+            for j in range(15):
+                for k in range(15):
+                    toprint = '1' if obs[(i*15*15) + (j * 15 + k)] == 1 else ('.' if obs[(i*15*15) + (j * 15 + k)] == 0 else obs[(i*15*15) + (j * 15 + k)])
+                    print(toprint, end=' ')
+                print()
+            print()
+        print(obs[15*15*3], obs[15*15*3 + 1], obs[15*15*3 + 2], obs[15*15*3 + 3])

@@ -1,7 +1,7 @@
 # script to make stable baseline 3 learn snake 
 # (made to test the env)
 
-import os, time, sys
+import os, time, sys, torch
 from pathlib import Path
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
@@ -12,21 +12,21 @@ from env.snake_env import SnakeEnv
 
 # ================ CONFIGS ================
 config = {
-    'gamma': 0.99,      # discount factor
-    'gae_lambda': 0.95, # GAE lambda (note: in SB3 is 'gae_lambda', not 'lambda')
-    'clip_range': 0.2,  # clip parameter (note: in SB3 is 'clip_range', not 'epsilon')
-    'learning_rate': 3e-4, # learning rate
-    'n_epochs': 10,     # training epochs per update
-    'batch_size': 64,
+    'gamma': 0.95,      # discount factor
+    'gae_lambda': 0.90, # GAE lambda (note: in SB3 is 'gae_lambda', not 'lambda')
+    'clip_range': 0.15,  # clip parameter (note: in SB3 is 'clip_range', not 'epsilon')
+    'learning_rate': 1e-4, # learning rate
+    'n_epochs': 4,     # training epochs per update
+    'batch_size': 32,
     'vf_coef': 0.5,     # value loss coefficient
-    'ent_coef': 0.01,   # entropy coefficient
+    'ent_coef': 0.1,    # entropy coefficient
     'n_steps': 2048,    # number of steps per update
     'verbose': 1
 
 }
-EPOCHS = 1000  # Training epochs
-EVAL_FREQ = 50  # Evaluation frequency
-SAVE_FREQ = 1000  # Model saving frequency
+EPOCHS = 500000  # Training epochs
+EVAL_FREQ = 500  # Evaluation frequency
+SAVE_FREQ = 100000  # Model saving frequency
 VISUALIZE_FREQUENCY = 50  # Interval between games (played by the model) shown
 BUFFER_SIZE = 2048  # Number of stepls the model plays before learning
 
@@ -35,12 +35,30 @@ BUFFER_SIZE = 2048  # Number of stepls the model plays before learning
 if __name__ == "__main__":    
     eval_env = SnakeEnv()
     train_env = Monitor(SnakeEnv())
+
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = PPO(
         "MlpPolicy",  # Using MLP policy for 1D observation
         train_env,
         policy_kwargs=dict(net_arch=[128, 128]),  # 2 hidden layers of 128 neurons
+        device=device,
         **config
     )
+
+    obs, _ = eval_env.reset()
+    print(f"Observation type: {type(obs)}")
+    print(f"Observation dtype: {obs.dtype}")
+    print(f"Observation shape: {obs.shape}")
+
+    eval_env._print_obs(obs)
+    
+    # Testa la conversione a tensore
+    import torch
+    try:
+        tensor = torch.tensor(obs)
+        print("Conversion successful")
+    except Exception as e:
+        print(f"Conversion failed: {e}")
     
 
     # =============== TRAINING LOOP ===============

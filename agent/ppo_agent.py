@@ -187,7 +187,7 @@ class PPOAgent:
         
         self.buffer.clear()
 
-    def save(self, path='agent/resoults', model_name='ppo_agent'):
+    def save(self, path='resoults', model_name='ppo_agent'):
         # Saves the model
         # Creates the directory if does not exist
         os.makedirs(path, exist_ok=True)
