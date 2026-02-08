@@ -1,6 +1,6 @@
 __pycache__/
 .venv/
-agent/resoults/checkpoints/
-agent/resoults/config/
-agent/resoults/final_model.pth
+resoults/checkpoints/
+resoults/config/
+resoults/final_model.pth
 debug/sb3_logs/
