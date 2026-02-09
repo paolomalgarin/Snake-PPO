@@ -14,6 +14,7 @@ if __name__ == "__main__":
 
     parser.add_argument('--w', type=int, default=10, help='Width of the grid')
     parser.add_argument('--h', type=int, default=10, help='Height of the grid')
+    parser.add_argument('--gui', type=int, default=10, help='Height of the grid')
     args = parser.parse_args()
 
     if args.w is not None:
@@ -25,7 +26,7 @@ if __name__ == "__main__":
 
 
     # ------------------------ game logic (debug part) ------------------------
-    game.spawnFood()
+    game.reset()
     game.displayCMD()
 
     while not game.isGameOver:
@@ -53,3 +54,5 @@ if __name__ == "__main__":
 
     print("=== GAME OVER! ===")
     print("[Score " + str(game.score) + "]\n")
+
+    game.close()

@@ -9,8 +9,10 @@ class SnakeEnv(Env):
     ACTION_LENGTH = 3
     OBS_LENGTH = 679
 
-    def __init__(self):
-        self.game = SnakeGame()
+    def __init__(self, useGui = False):
+        self.game = SnakeGame(useGui=useGui)
+        self.useGui = useGui
+        self.game.reset()
         self.action_space = spaces.Discrete(
             3
         )  # 3 actions: move forward, turn right, turn left
@@ -62,11 +64,14 @@ class SnakeEnv(Env):
 
     def render(self):
         # renders the current game state
-        self.game.displayCMD()  # (temporary)
+        if(not self.useGui):
+            self.game.displayCMD()  # (temporary)
+        else:
+            self.drawWindow()
 
     def close(self):
         # closes pygame and widows
-        pass
+        self.game.close()
 
     def _get_obs(self):
         grid = np.zeros((self.OBS_LENGTH,), dtype=np.float32)
@@ -115,7 +120,7 @@ class SnakeEnv(Env):
         # self.prev_food_distance = new_food_distance
 
         # it moved, so -1 to promote shorter paths
-        # reward -= 1
+        # reward -= 0.01
         # reward += 1
 
         # -10 if dies

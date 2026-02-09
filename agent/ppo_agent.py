@@ -6,22 +6,26 @@ import json, os
 
 class ActorCritic(nn.Module):
 
-    def __init__(self, obs_dim, action_dim, hidden_dim=256):
+    def __init__(self, obs_dim, action_dim):
         super().__init__()
 
-        self.input_layer = nn.Linear(obs_dim, hidden_dim)
-        self.hidden_layer = nn.Linear(hidden_dim, hidden_dim)
+        self.input_layer = nn.Linear(obs_dim, 128*3)
+        self.hidden_layer1 = nn.Linear(128*3, 128)
+        self.hidden_layer2 = nn.Linear(128, 128)
+        self.hidden_layer3 = nn.Linear(128, 32)
         self.relu = nn.ReLU()
         
-        self.policy_head = nn.Linear(hidden_dim, action_dim)
-        self.value_head = nn.Linear(hidden_dim, 1)
+        self.policy_head = nn.Linear(32, action_dim)
+        self.value_head = nn.Linear(32, 1)
 
     def forward(self, obs):
         x = self.input_layer(obs)
         x = self.relu(x)
-        x = self.hidden_layer(x)
+        x = self.hidden_layer1(x)
         x = self.relu(x)
-        x = self.hidden_layer(x)
+        x = self.hidden_layer2(x)
+        x = self.relu(x)
+        x = self.hidden_layer3(x)
         x = self.relu(x)
 
         logits = self.policy_head(x)

@@ -2,7 +2,7 @@
     "gamma": 0.95,
     "lambda": 0.9,
     "epsilon": 0.15,
-    "lr": 0.0003,
+    "lr": 0.0002,
     "epochs": 4,
     "batch_size": 32,
     "value_coef": 0.5,
