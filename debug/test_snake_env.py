@@ -63,18 +63,18 @@ if __name__ == "__main__":
     # Save the final model
     model.save("debug/sb3_logs/final_model")
 
+    env.close()
 
     # =============== TESTING TRAINED MODEL ===============
     print("\n=== Testing Trained Model ===")
 
     # Load the best model (or use final model)
-    best_model_path = "debug/sb3_logs/best_model/best_model.zip"
-    if os.path.exists(best_model_path):
-        model = PPO.load(best_model_path)
-    else:
-        model = PPO.load("debug/sb3_logs/final_model.zip")
+    # best_model_path = "debug/sb3_logs/best_model/best_model.zip"
+    # if os.path.exists(best_model_path):
+    #     model = PPO.load(best_model_path)
+    # else:
+    #     model = PPO.load("debug/sb3_logs/final_model.zip")
     
-    env.close()
 
     # Visualize a game
     env = SnakeEnv(False)
