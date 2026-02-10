@@ -24,6 +24,7 @@ class SnakeEnv(Env):
         self.max_steps = self.game.gridHeight * self.game.gridWidth * 10
         self.prev_score = self.game.score
         self.prev_food_distance = self.game.getFoodDistance()
+        self.loopBuffer = []  # buffer containing every position the head of the snake has been (get resetted every time the snake eats) to check if the snake is circling 
         self.steps = 0
 
     def reset(self, seed=None, options=None):
@@ -32,6 +33,7 @@ class SnakeEnv(Env):
         self.prev_score = self.game.score
         self.prev_food_distance = self.game.getFoodDistance()
         self.max_steps = self.game.gridHeight * self.game.gridWidth * 10
+        self.loopBuffer.clear()  # buffer containing every position the head of the snake has been (get resetted every time the snake eats) to check if the snake is circling 
 
         obs = self._get_obs()
         info = {}
@@ -52,6 +54,9 @@ class SnakeEnv(Env):
 
         self.game.changeDir(newDir)
         self.game.move()
+
+        # Add the new position in the anti-circling buffer
+        self.loopBuffer.append(self.game.head)
 
         obs = self._get_obs()
         reward = self._compute_reward()
@@ -106,22 +111,34 @@ class SnakeEnv(Env):
     def _compute_reward(self):
         reward = 0
 
-        # +10 if eats food (and add more steps)
-        if self.game.score > self.prev_score:
-            self.prev_score = self.game.score
-            reward += 1
 
         # +0.1 if gets closer to food, -0.1 if gets furder from food
         new_food_distance = self.game.getFoodDistance()
-        if new_food_distance < self.prev_food_distance:
-            reward += 0.1
-        else:
-            reward -= 0.1
+
+        if self.game.score == self.prev_score:  # avoids giving penalities immediatly after the snake eat
+            if new_food_distance < self.prev_food_distance:
+                reward += 0.1
+            else:
+                reward -= 0.11
+
         self.prev_food_distance = new_food_distance
+        
+        # +10 if eats food (and add more steps)
+        if self.game.score > self.prev_score:
+            self.prev_score = self.game.score
+            reward += 3
+            
+            # Flush the anti-circling buffer
+            self.loopBuffer.append(self.game.head)
+
+        
+        # penality for circling
+        if(self.game.head in self.loopBuffer):
+            reward -= 0.3
 
         # -10 if dies
         if self.game.isGameOver:
-            reward = -1
+            reward = -10
 
         return float(reward)
 
