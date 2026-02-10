@@ -67,7 +67,7 @@ class SnakeEnv(Env):
         if(not self.useGui):
             self.game.displayCMD()  # (temporary)
         else:
-            self.drawWindow()
+            self.game.drawWindow()
 
     def close(self):
         # closes pygame and widows
@@ -109,23 +109,19 @@ class SnakeEnv(Env):
         # +10 if eats food (and add more steps)
         if self.game.score > self.prev_score:
             self.prev_score = self.game.score
-            reward += 10
+            reward += 1
 
         # +0.1 if gets closer to food, -0.1 if gets furder from food
-        # new_food_distance = self.game.getFoodDistance()
-        # if new_food_distance < self.prev_food_distance:
-        #     reward += 0.5
-        # else:
-        #     reward -= 0.5
-        # self.prev_food_distance = new_food_distance
-
-        # it moved, so -1 to promote shorter paths
-        # reward -= 0.01
-        # reward += 1
+        new_food_distance = self.game.getFoodDistance()
+        if new_food_distance < self.prev_food_distance:
+            reward += 0.1
+        else:
+            reward -= 0.1
+        self.prev_food_distance = new_food_distance
 
         # -10 if dies
         if self.game.isGameOver:
-            reward = -10
+            reward = -1
 
         return float(reward)
 

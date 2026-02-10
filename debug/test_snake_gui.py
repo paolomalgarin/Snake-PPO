@@ -1,11 +1,20 @@
 
 from env.snake_game import SnakeGame, Direction
 import pygame
+import argparse
 
 
 
 if __name__ == "__main__":
-    game = SnakeGame(15, 10, True)
+    parser = argparse.ArgumentParser(description='Snake game')
+    
+    parser.add_argument('--guiH', type=int, default=680, help='Height of the gui window')
+    args = parser.parse_args()
+
+    if args.guiH is not None:
+        guiHeight = args.guiH
+
+    game = SnakeGame(15, 10, True, windowHeight=guiHeight)
     game.reset()
 
     print("Move (w=up, s=down, a=left, d=right, q=quit)")
