@@ -70,16 +70,22 @@ class PPOAgent:
     
     def learn(self, total_timesteps):
         t_so_far = 0 # Timesteps simulated so far
+        batch_n = 0  # Batch number
         pbar = PBar(total_timesteps, preset="training")
         
         # PPO ALG STEP 2
         while(t_so_far < total_timesteps):
             # PPO ALG STEP 3
-            batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout()
+            batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_rews, batch_lens = self.rollout()
+            batch_n += 1
 
             # Calculate how many timesteps we collected this batch
-            t_so_far += np.sum(batch_lens)
-            pbar.update(np.sum(batch_lens))
+            total_batch_steps = np.sum(batch_lens)
+            t_so_far += total_batch_steps
+            pbar.update(total_batch_steps)
+
+            # Display batch resoults
+            self._print_stats(total_batch_steps, batch_rews, batch_lens, batch_n)
 
             # Calculate V_{phi, k}
             V, _ = self.evaluate(batch_obs, batch_acts)
@@ -184,7 +190,7 @@ class PPOAgent:
         batch_rtgs = self.compute_rtgs(batch_rews)
 
         # Return the data of the batch 
-        return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens
+        return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_rews, batch_lens
 
     def get_action(self, obs):
         # Query the actor network for a mean action
@@ -235,3 +241,45 @@ class PPOAgent:
 
         # Return predicted values V and log probs log_probs
         return V, log_probs
+    
+    def _print_stats(self, batch_steps, batch_rews, batch_lens, batch_n = None):
+
+        # Calculate values to print
+        mean_reward = sum(sum(ep_rews) for ep_rews in batch_rews) / len(batch_rews)
+        mean_ep_len = sum(batch_lens) / len(batch_lens)
+        max_ep_len = max(batch_lens)
+
+        strings = [
+            f"| ", 
+            f"| Mean reward       |  {mean_reward:.2f} ",
+            f"| Mean episode len  |  {mean_ep_len:.1f} ",
+            f"| Max episode len   |  {max_ep_len} ", 
+            f"| Total batch steps |  {batch_steps} ",
+        ]
+
+        # Calculate max string length
+        max_len = max(len(s) for s in strings)
+
+        # Create separator string
+        separator = "-" * (max_len + 2)
+
+        # Create 'title' string
+        title_separator_len = int((max_len - len(f"|  BATCH{f' {batch_n}' if batch_n != None else ''} ")) / 2)
+        title = (
+            "| " + 
+            " " * title_separator_len +
+            f" BATCH{f' {batch_n}' if batch_n != None else ''} " +
+            " " * title_separator_len +
+            (' ' if (max_len - len(f"|  BATCH{f' {batch_n}' if batch_n != None else ''} ")) % 2 != 0 else '') +
+            " |"
+        )
+
+        # Print stats
+        print(separator)
+        
+        print(title)
+        for s in strings:
+            print(s, end=(" " * (max_len - len(s)) + " |\n"))
+
+        print(separator)
+        print()
