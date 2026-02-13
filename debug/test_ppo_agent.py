@@ -2,8 +2,7 @@
 # (made to test ppo agent learning ability)
 
 import gymnasium as gym
-import os, time, sys
-from pathlib import Path
+import time, argparse
 from agent.ppo_agent import PPOAgent
 
 
@@ -11,19 +10,38 @@ TIMESTEPS = 100_000  # Training timestamps
 
 
 if __name__ == "__main__":
+
+    # 
+    parser = argparse.ArgumentParser(description='test_ppo_agent.py arguments')
+    
+    parser.add_argument('--ts', type=int, default=None, help='Total training timestamps')
+    args = parser.parse_args()
+    
+    if args.ts is not None:
+        TIMESTEPS = args.ts
+
+
+    print("Creating environment...")
+    
+    # Agent and environment initialization
     env = gym.make("CartPole-v1", render_mode="rgb_array")
     agent = PPOAgent(env)
-
-    # Hyperparameters settings
+    
+    print("environment created!")
+    
+    # Agent hyperparameters settings
     agent.timestamps_per_batch = 2048
     
-    # Train the agent
+
+    # Agent training
     print("\n=== TRAINING ===")
+    
     agent.learn(TIMESTEPS)
 
     env.close()
 
-    # Testing trained model
+
+    # Trained agent testing
     test_env = gym.make("CartPole-v1", render_mode="human")   
     obs, _ = test_env.reset()
     stop = False
