@@ -1,10 +1,11 @@
 # Modello PPO
 import torch
 from torch import nn
+from torch.distributions import MultivariateNormal
+from torch.optim import Adam
 import numpy as np
-import json, os
 
-class ActorCritic(nn.Module):
+class FeedForwardNN(nn.Module):
 
     def __init__(self, obs_dim, action_dim):
         super().__init__()
@@ -19,6 +20,10 @@ class ActorCritic(nn.Module):
         self.value_head = nn.Linear(32, 1)
 
     def forward(self, obs):
+        # Convert observation to tensor if it's a numpy array
+        if isinstance(obs, np.ndarray):
+            obs = torch.tensor(obs, dtype=torch.float)
+
         x = self.input_layer(obs)
         x = self.relu(x)
         x = self.hidden_layer1(x)
@@ -33,223 +38,194 @@ class ActorCritic(nn.Module):
         return logits, value
 
 
-
-class RolloutBuffer:
-
-    def __init__(self):
-        self.clear()
-
-    def store(self, obs, action, log_prob, value, reward, done, score):
-        self.obs.append(obs)
-        self.actions.append(action)
-        self.log_probs.append(log_prob)
-        self.values.append(value)
-        self.rewards.append(reward)
-        self.dones.append(done)
-        self.scores.append(score)
-    
-    def clear(self):
-        self.obs = []
-        self.actions = []
-        self.log_probs = []
-        self.values = []
-        self.rewards = []
-        self.dones = []
-        self.scores = []
-
-
+# CREDITS:
+# https://medium.com/@eyyu/coding-ppo-from-scratch-with-pytorch-part-2-4-f9d8b8aa938a
+# PPO ALGO (pseudo code):
+# https://spinningup.openai.com/en/latest/_images/math/e62a8971472597f4b014c2da064f636ffe365ba3.svg
 
 class PPOAgent:
+
+    def __init__(self, env):
+        # Extract environment information
+        self.env = env
+        self.obs_dim = env.observation_space.shape[0]
+        self.act_dim = env.action_space.shape[0]
+
+        self._init_hyperparameters()
+
+        # PPO ALG STEP 1
+        # Initialize actor and critic networks
+        self.actor = FeedForwardNN(self.obs_dim, self.act_dim)
+        self.critic = FeedForwardNN(self.obs_dim, 1)
+
+        self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
+        self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
+
+        # Create the covariance matrix
+        # Note that I chose 0.5 for stdev arbitrarily.
+        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
+        self.cov_mat = torch.diag(self.cov_var)
     
-    def __init__(self, obs_dim, action_dim, config=None):
-        self.config = config or {
-            'gamma': 0.99,      # discount factor
-            'lambda': 0.95,     # GAE lambda
-            'epsilon': 0.2,     # clip parameter
-            'lr': 3e-4,         # learning rate
-            'epochs': 10,       # training epochs per update
-            'batch_size': 64,
-            'value_coef': 0.5,  # value loss coefficient
-            'entropy_coef': 0.01
-        }
+    def learn(self, total_timesteps):
+        t_so_far = 0 # Timesteps simulated so far
         
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model: ActorCritic = ActorCritic(obs_dim, action_dim).to(self.device)
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.config['lr'])
-        self.buffer = RolloutBuffer()
+        # PPO ALG STEP 2
+        while(t_so_far < total_timesteps):
+            # PPO ALG STEP 3
+            batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout()
 
-    def select_actions(self, obs):
-        # usa la policy corrente per selezionare un azione date le osservazioni
-        obs = self._preprocess_obs(obs)
-        obs_tensor = torch.FloatTensor(obs).unsqueeze(0).to(self.device)
-        
-        with torch.no_grad():
-            logits, value = self.model(obs_tensor)
-            probs = torch.softmax(logits, dim=-1)
-            dist = torch.distributions.Categorical(probs)
-            action = dist.sample()
-            log_prob = dist.log_prob(action)
-        
-        return action.item(), log_prob.item(), value.item()
+            # Calculate how many timesteps we collected this batch
+            t_so_far += np.sum(batch_lens)
 
-    def collect_rollout(self, env, num_steps=2048):
-        # Raccoglie esperienze interagendo con l'ambiente
-        obs, _ = env.reset()
-        for _ in range(num_steps):
-            action, log_prob, value = self.select_actions(obs)
-            next_obs, reward, terminated, truncated, info = env.step(action)
-            done = terminated or truncated
+            # Calculate V_{phi, k}
+            V, _ = self.evaluate(batch_obs, batch_acts)
+
+            # PPO ALG STEP 5 (step 4 is in rollout function)
+            # Calculate advantage
+            A_k = batch_rtgs - V.detach()
+
+            # Normalize advantages
+            A_k = (A_k - A_k.mean()) / (A_k.std() + 1e-10)
+
+            for _ in range(self.n_updates_per_iteration):
+                # Epoch code (where we perform multiple updates on the actor and critic networks)
+
+                # Calculate pi_theta(a_t | s_t)
+                V, curr_log_probs = self.evaluate(batch_obs, batch_acts)
+                
+                # Calculate ratios
+                ratios = torch.exp(curr_log_probs - batch_log_probs)
+
+                # Calculate surrogate losses
+                surr1 = ratios * A_k
+                surr2 = torch.clamp(ratios, 1 - self.clip, 1 + self.clip) * A_k
+
+                actor_loss = (-torch.min(surr1, surr2)).mean()
+                critic_loss = nn.MSELoss()(V, batch_rtgs)
+                
+                # Calculate gradients and perform backward propagation for actor network
+                self.actor_optim.zero_grad()
+                actor_loss.backward(retain_graph=True)
+                self.actor_optim.step()
+
+                # Calculate gradients and perform backward propagation for critic network
+                self.critic_optim.zero_grad()
+                critic_loss.backward()
+                self.critic_optim.step()
+
+
+    def _init_hyperparameters(self):
+        # Default values for hyperparameters
+        self.timestamps_per_batch = 4800        # timesteps per batch (a batch is a number of timesteps before updating PPO's policy)
+        self.max_timestamps_per_episode = 1600  # timesteps per episode (an episode is a game inside the env)
+        self.gamma = 0.95
+        self.n_updates_per_iteration = 5        # Number of epoch, used to perform multiple updates on the actor and critic networks
+        self.clip = 0.2
+        self.lr = 0.005
+
+    def rollout(self):
+        # Data of a batch
+        batch_obs = []             # batch observations
+        batch_acts = []            # batch actions
+        batch_log_probs = []       # log probs of each action
+        batch_rews = []            # batch rewards
+        batch_rtgs = []            # batch rewards-to-go
+        batch_lens = []            # episodic lengths in batch
+
+
+        # Number of timesteps run so far this batch
+        t = 0
+
+        # => BATCH <=
+        while t < self.timestamps_per_batch:
             
-            # Memo: l'obs di SnakeEnv è un dict, devi trasformarlo in vettore
-            flat_obs = self._preprocess_obs(obs)
-            self.buffer.store(flat_obs, action, log_prob, value, reward, done, info['score'])
+            # Rewards of this episode
+            ep_rewards = []
+
+            obs, _ = self.env.reset()
+            done = False
+
+            # => EPISODE <=
+            for ep_t in range(self.max_timestamps_per_episode):
+
+                t += 1
+
+                # Collect current observation
+                batch_obs.append(obs)
+
+                action, log_prob = self.get_action(obs)
+                obs, rew, terminated, truncated, _ = self.env.step(action)
+                done = terminated or truncated
+
+                # Collect current reward, action, and log prob
+                ep_rewards.append(rew)
+                batch_acts.append(action)
+                batch_log_probs.append(log_prob)
+
+                if(done):
+                    break
             
-            obs = next_obs
-            if done:
-                obs, _ = env.reset()
+            # Collect episode length and rewards
+            batch_lens.append(ep_t + 1)  # +1 because timestep starts at 0
+            batch_rews.append(ep_rewards)
         
-        return self.buffer
+        # Reshape data as tensors before returning
+        batch_obs = torch.tensor(np.array(batch_obs), dtype=torch.float)
+        batch_acts = torch.tensor(np.array(batch_acts), dtype=torch.float)
+        batch_log_probs = torch.tensor(np.array(batch_log_probs), dtype=torch.float)
 
-    def compute_gae(self):
-        #Calcola i GAE (Generalized Advantage Estimation)
-        rewards = torch.tensor(self.buffer.rewards, dtype=torch.float32)
-        values = torch.tensor(self.buffer.values, dtype=torch.float32)
-        dones = torch.tensor(self.buffer.dones, dtype=torch.float32)
+        # PPO ALG STEP 4
+        batch_rtgs = self.compute_rtgs(batch_rews)
+
+        # Return the data of the batch 
+        return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_lens
+
+    def get_action(self, obs):
+        # Query the actor network for a mean action
+        mean, _ = self.actor.forward(obs)
+
+        # Create our Multivariate Normal Distribution
+        dist = MultivariateNormal(mean, self.cov_mat)
         
-        advantages = torch.zeros_like(rewards)
-        last_advantage = 0
-        last_value = 0  # oppure l'ultimo value predetto
-        
-        # Calcola GAE all'indietro
-        for t in reversed(range(len(rewards))):
-            if t == len(rewards) - 1:
-                next_value = last_value
-            else:
-                next_value = values[t + 1]
+        # Sample an action from the distribution and get its log prob
+        action = dist.sample()
+        log_prob = dist.log_prob(action)
+
+        # Return the sampled action and the log prob of that action
+        # Note that I'm calling detach() since the action and log_prob  
+        # are tensors with computation graphs, so I want to get rid
+        # of the graph and just convert the action to numpy array.
+        # log prob as tensor is fine. Our computation graph will
+        # start later down the line.
+        return action.detach().numpy(), log_prob.detach()
+
+    def compute_rtgs(self, batch_rewards):
+        # Calculate the rewards-to-go (rtg) per episode per batch to return
+        batch_rtgs = []
+
+        # Iterate through each episode backwards to maintain the same order in batch_rtgs
+        for ep_rews in reversed(batch_rewards):
+
+            discounted_reward = 0  # The discounted reward so far
+
+            for rew in reversed(ep_rews):
+                discounted_reward = rew + discounted_reward * self.gamma
+                batch_rtgs.insert(0, discounted_reward)
             
-            delta = rewards[t] + self.config['gamma'] * next_value * (1 - dones[t]) - values[t]
-            advantages[t] = last_advantage = delta + self.config['gamma'] * self.config['lambda'] * (1 - dones[t]) * last_advantage
-        
-        returns = advantages + values
-        return advantages, returns
+        # Convert the rewards-to-go into a tensor
+        batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float)
 
-    def ppo_update(self):
-        # Updates the policy using the ppo algorithm
-        # Prepara dati
-        obs = torch.FloatTensor(np.array(self.buffer.obs))
-        actions = torch.tensor(self.buffer.actions, dtype=torch.long)
-        old_log_probs = torch.tensor(self.buffer.log_probs, dtype=torch.float32)
-        old_values = torch.tensor(self.buffer.values, dtype=torch.float32)
-        
-        # Calcola GAE
-        advantages, returns = self.compute_gae()
-        advantages = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
-        
-        # Multiple epoch update
-        for epoch in range(self.config['epochs']):
-            # Mini-batch update
-            indices = torch.randperm(len(obs))
-            
-            for start in range(0, len(obs), self.config['batch_size']):
-                end = start + self.config['batch_size']
-                batch_idx = indices[start:end]
-                
-                batch_obs = obs[batch_idx].to(self.device)
-                batch_actions = actions[batch_idx].to(self.device)
-                batch_old_log_probs = old_log_probs[batch_idx].to(self.device)
-                batch_advantages = advantages[batch_idx].to(self.device)
-                batch_returns = returns[batch_idx].to(self.device)
-                
-                # Forward pass
-                logits, values = self.model(batch_obs)
-                probs = torch.softmax(logits, dim=-1)
-                dist = torch.distributions.Categorical(probs)
-                
-                # Calcola nuove probabilità
-                new_log_probs = dist.log_prob(batch_actions)
-                entropy = dist.entropy().mean()
-                
-                # Ratio per PPO
-                ratio = (new_log_probs - batch_old_log_probs).exp()
-                
-                # PPO Clipped Loss
-                surr1 = ratio * batch_advantages
-                surr2 = torch.clamp(ratio, 1 - self.config['epsilon'], 1 + self.config['epsilon']) * batch_advantages
-                policy_loss = -torch.min(surr1, surr2).mean()
-                
-                # Value Loss
-                value_loss = ((values.squeeze() - batch_returns) ** 2).mean()
-                
-                # Total Loss
-                loss = policy_loss + self.config['value_coef'] * value_loss - self.config['entropy_coef'] * entropy
-                
-                # Update
-                self.optimizer.zero_grad()
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(self.model.parameters(), 0.5)
-                self.optimizer.step()
-        
-        self.buffer.clear()
+        return batch_rtgs
+    
+    def evaluate(self, batch_obs, batch_acts):
+        # Asking critic network for a value V for each obs in batch_obs
+        V, _ = self.critic.forward(batch_obs)
+        V.squeeze()
 
-    def save(self, path='resoults', model_name='ppo_agent'):
-        # Saves the model
-        # Creates the directory if does not exist
-        os.makedirs(path, exist_ok=True)
-        
-        # Creates the file
-        model_path = os.path.join(path, f"{model_name}.pth")
-        
-        # Saves the model
-        torch.save({
-            'model_state_dict': self.model.state_dict(),
-            'obs_dim': self.model.input_layer.in_features,
-            'action_dim': self.model.policy_head.out_features,
-        }, model_path)        
-        print(f"Model saved in: {model_path}")
+        # Calculate the log probabilities of batch actions using most recent actor network
+        mean, _ = self.actor.forward(batch_obs)
+        dist = MultivariateNormal(mean, self.cov_mat)
+        log_probs = dist.log_prob(batch_acts)
 
-    def load(self, path):
-        # Loads the model (returns true if loads successfully)
-        try:            
-            # Checks file existance
-            if not os.path.exists(path):
-                print(f"File not found ({path})")
-                return False
-                
-            checkpoint = torch.load(path, map_location=self.device)
-            
-            # Checks model dimensions
-            current_obs_dim = self.model.input_layer.in_features
-            current_action_dim = self.model.policy_head.out_features
-            
-            if current_obs_dim != checkpoint.get('obs_dim', current_obs_dim):
-                print(f"WARNING: obs_dim not matching! Saved model: {checkpoint.get('obs_dim')}, Current: {current_obs_dim}")
-                
-            if current_action_dim != checkpoint.get('action_dim', current_action_dim):
-                print(f"WARNING: action_dim not matching! Saved model: {checkpoint.get('action_dim')}, Current: {current_action_dim}")
-            
-            # Loads model wheights
-            self.model.load_state_dict(checkpoint['model_state_dict'])
-            print("Model load: SUCCESS")
-            return True
-            
-        except Exception as e:
-            print(f"Model load: ERROR \n{e}")
-            import traceback
-            traceback.print_exc()
-            return False
-
-
-    def _preprocess_obs(self, obs):
-        # Check if is already a vector
-        if isinstance(obs, np.ndarray):
-            return obs.flatten().astype(np.float32)
-
-        # Check if is not a dict    
-        if not isinstance(obs, dict):
-            return np.array(obs, dtype=np.float32).flatten()
-
-        # Convert dict observations in vector
-        grid = obs["grid"].flatten() / 3.0  # Normalizza 0-1
-        direction_onehot = np.zeros(4)
-        direction_onehot[obs["direction"]] = 1
-        return np.concatenate([grid, direction_onehot])
+        # Return predicted values V and log probs log_probs
+        return V, log_probs
