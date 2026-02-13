@@ -1,9 +1,10 @@
 # Modello PPO
 import torch
 from torch import nn
-from torch.distributions import MultivariateNormal
+from torch.distributions import Categorical
 from torch.optim import Adam
 import numpy as np
+from tqdm import tqdm
 
 class FeedForwardNN(nn.Module):
 
@@ -49,7 +50,7 @@ class PPOAgent:
         # Extract environment information
         self.env = env
         self.obs_dim = env.observation_space.shape[0]
-        self.act_dim = env.action_space.shape[0]
+        self.act_dim = env.action_space.n # Now ONLY handles Discrete actions
 
         self._init_hyperparameters()
 
@@ -61,13 +62,16 @@ class PPOAgent:
         self.actor_optim = Adam(self.actor.parameters(), lr=self.lr)
         self.critic_optim = Adam(self.critic.parameters(), lr=self.lr)
 
-        # Create the covariance matrix
-        # Note that I chose 0.5 for stdev arbitrarily.
-        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
-        self.cov_mat = torch.diag(self.cov_var)
+        # (useless for discrete action spaces)
+        # # Create the covariance matrix
+        # # Note that I chose 0.5 for stdev arbitrarily.
+        # self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
+        # self.cov_mat = torch.diag(self.cov_var)
     
     def learn(self, total_timesteps):
         t_so_far = 0 # Timesteps simulated so far
+        pbar = tqdm(total=total_timesteps)
+        pbar.set_description("Training")
         
         # PPO ALG STEP 2
         while(t_so_far < total_timesteps):
@@ -76,6 +80,7 @@ class PPOAgent:
 
             # Calculate how many timesteps we collected this batch
             t_so_far += np.sum(batch_lens)
+            pbar.update(np.sum(batch_lens))
 
             # Calculate V_{phi, k}
             V, _ = self.evaluate(batch_obs, batch_acts)
@@ -112,6 +117,8 @@ class PPOAgent:
                 self.critic_optim.zero_grad()
                 critic_loss.backward()
                 self.critic_optim.step()
+        
+        pbar.close()
 
 
     def _init_hyperparameters(self):
@@ -121,7 +128,7 @@ class PPOAgent:
         self.gamma = 0.95
         self.n_updates_per_iteration = 5        # Number of epoch, used to perform multiple updates on the actor and critic networks
         self.clip = 0.2
-        self.lr = 0.005
+        self.lr = 3e-4
 
     def rollout(self):
         # Data of a batch
@@ -171,7 +178,7 @@ class PPOAgent:
         
         # Reshape data as tensors before returning
         batch_obs = torch.tensor(np.array(batch_obs), dtype=torch.float)
-        batch_acts = torch.tensor(np.array(batch_acts), dtype=torch.float)
+        batch_acts = torch.tensor(np.array(batch_acts), dtype=torch.long)
         batch_log_probs = torch.tensor(np.array(batch_log_probs), dtype=torch.float)
 
         # PPO ALG STEP 4
@@ -184,8 +191,8 @@ class PPOAgent:
         # Query the actor network for a mean action
         mean, _ = self.actor.forward(obs)
 
-        # Create our Multivariate Normal Distribution
-        dist = MultivariateNormal(mean, self.cov_mat)
+        # Create a Categorical Distribution
+        dist = Categorical(logits=mean)
         
         # Sample an action from the distribution and get its log prob
         action = dist.sample()
@@ -220,12 +227,12 @@ class PPOAgent:
     def evaluate(self, batch_obs, batch_acts):
         # Asking critic network for a value V for each obs in batch_obs
         V, _ = self.critic.forward(batch_obs)
-        V.squeeze()
+        V = V.squeeze()
 
         # Calculate the log probabilities of batch actions using most recent actor network
         mean, _ = self.actor.forward(batch_obs)
-        dist = MultivariateNormal(mean, self.cov_mat)
-        log_probs = dist.log_prob(batch_acts)
+        dist = Categorical(logits=mean)
+        log_probs = dist.log_prob(batch_acts.squeeze())
 
         # Return predicted values V and log probs log_probs
         return V, log_probs
