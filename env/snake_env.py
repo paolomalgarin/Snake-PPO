@@ -43,6 +43,9 @@ class SnakeEnv(Env):
     def step(self, action):
         self.steps += 1
 
+        # Add the OLD position in the anti-circling buffer
+        self.loopBuffer.append(self.game.head)
+
         # 3 actions: 0 = move forward, 1 = turn right, 2 = turn left
         match action:
             case 0:
@@ -54,9 +57,6 @@ class SnakeEnv(Env):
 
         self.game.changeDir(newDir)
         self.game.move()
-
-        # Add the new position in the anti-circling buffer
-        self.loopBuffer.append(self.game.head)
 
         obs = self._get_obs()
         reward = self._compute_reward()
@@ -117,28 +117,30 @@ class SnakeEnv(Env):
 
         if self.game.score == self.prev_score:  # avoids giving penalities immediatly after the snake eat
             if new_food_distance < self.prev_food_distance:
-                reward += 0.1
+                # reward += 0.1
+                pass
             else:
-                reward -= 0.11
+                # reward -= 0.18
+                reward -= 0.3
 
         self.prev_food_distance = new_food_distance
         
         # +10 if eats food (and add more steps)
         if self.game.score > self.prev_score:
             self.prev_score = self.game.score
-            reward += 3
+            reward += 10
             
             # Flush the anti-circling buffer
-            self.loopBuffer.append(self.game.head)
+            self.loopBuffer.clear()
 
         
         # penality for circling
         if(self.game.head in self.loopBuffer):
-            reward -= 0.3
+            reward -= 0.2
 
         # -10 if dies
         if self.game.isGameOver:
-            reward = -10
+            reward = -11
 
         return float(reward)
 

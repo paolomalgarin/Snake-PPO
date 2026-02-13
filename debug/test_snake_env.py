@@ -13,7 +13,7 @@ from env.snake_env import SnakeEnv
 
 # ================ CONFIGS ================
 config = {
-    "gamma": 0.95,  # discount factor
+    "gamma": 0.99,  # discount factor
     "gae_lambda": 0.90,  # GAE lambda (note: in SB3 is 'gae_lambda', not 'lambda')
     "clip_range": 0.1,  # clip parameter (note: in SB3 is 'clip_range', not 'epsilon')
     "learning_rate": 1e-4,  # learning rate
@@ -24,7 +24,7 @@ config = {
     "n_steps": 2048,  # number of steps per update
     "verbose": 1,
 }
-STEPS = 3e6  # Training steps (actions taken)
+STEPS = 2e6  # Training steps (actions taken)
 EVAL_FREQ = 500  # Evaluation frequency
 SAVE_FREQ = 1e6  # Model saving frequency
 VISUALIZE_FREQUENCY = 50  # Interval between games (played by the model) shown
@@ -95,7 +95,7 @@ if __name__ == "__main__":
         env.render()
 
         # Add small delay for visualization
-        time.sleep(0.8)
+        time.sleep(0.4)
 
         # Print game info every 10 steps
         if step_count % 10 == 0:
