@@ -7,7 +7,6 @@ from pathlib import Path
 from agent.ppo_agent import PPOAgent
 
 
-
 TIMESTEPS = 100_000  # Training timestamps
 
 
@@ -19,6 +18,7 @@ if __name__ == "__main__":
     agent.timestamps_per_batch = 2048
     
     # Train the agent
+    print("\n=== TRAINING ===")
     agent.learn(TIMESTEPS)
 
     env.close()

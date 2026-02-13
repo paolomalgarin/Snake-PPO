@@ -4,7 +4,7 @@ from torch import nn
 from torch.distributions import Categorical
 from torch.optim import Adam
 import numpy as np
-from tqdm import tqdm
+from tools.beautyful_progress_bar import PBar
 
 class FeedForwardNN(nn.Module):
 
@@ -70,8 +70,7 @@ class PPOAgent:
     
     def learn(self, total_timesteps):
         t_so_far = 0 # Timesteps simulated so far
-        pbar = tqdm(total=total_timesteps)
-        pbar.set_description("Training")
+        pbar = PBar(total_timesteps, preset="training")
         
         # PPO ALG STEP 2
         while(t_so_far < total_timesteps):
