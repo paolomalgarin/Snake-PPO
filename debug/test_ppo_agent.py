@@ -11,7 +11,7 @@ TIMESTEPS = 100_000  # Training timestamps
 
 if __name__ == "__main__":
 
-    # 
+    # Collecting arguments
     parser = argparse.ArgumentParser(description='test_ppo_agent.py arguments')
     
     parser.add_argument('--ts', type=int, default=None, help='Total training timestamps')

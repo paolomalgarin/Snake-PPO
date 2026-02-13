@@ -9,7 +9,7 @@ from rich.progress import (
 
 class PBar:
 
-    def __init__(self, total, description, preset=None):
+    def __init__(self, total, description='', preset=None):
         self.progress = None
         self.task_id = None
         self._closed = False
