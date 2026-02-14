@@ -5,6 +5,7 @@ from torch.distributions import Categorical
 from torch.optim import Adam
 import numpy as np
 from tools.beautyful_progress_bar import PBar
+import os
 
 class FeedForwardNN(nn.Module):
 
@@ -241,6 +242,45 @@ class PPOAgent:
 
         # Return predicted values V and log probs log_probs
         return V, log_probs
+    
+    def save(self, total_timesteps = None, path = os.path.join('resoults', 'model'), file_name = 'final_mnodel.pth'):
+        saving_path = os.path.join(path, file_name)
+
+        # Create folders if not exists
+        os.makedirs(path, exist_ok=True)
+
+        # Create checkpoint
+        checkpoint = {
+            'actor_state_dict': self.actor.state_dict(),
+            'critic_state_dict': self.critic.state_dict(),
+            'actor_optim_state_dict': self.actor_optim.state_dict(),
+            'critic_optim_state_dict': self.critic_optim.state_dict(),
+            'timesteps_trained': total_timesteps
+        }
+
+        # Save checkpoint
+        torch.save(checkpoint, saving_path)
+        print(f'Model saved in [ {saving_path} ]')
+
+    def load(self, path, device=None, load_optimizers=True):
+        # Fetch the states
+        checkpoint = torch.load(path, map_location=device)
+
+        # Load actor and critic
+        self.actor.load_state_dict(checkpoint['actor_state_dict'])
+        self.critic.load_state_dict(checkpoint['critic_state_dict'])
+
+        # Load optimizers if requested
+        if load_optimizers and 'actor_optim_state_dict' in checkpoint:
+            self.actor_optim.load_state_dict(checkpoint['actor_optim_state_dict'])
+        if load_optimizers and 'critic_optim_state_dict' in checkpoint:
+            self.critic_optim.load_state_dict(checkpoint['critic_optim_state_dict'])
+
+        # Returns model's timestamps
+        ts = checkpoint.get('timestamps_trained', None)
+        print('Model loaded successfully!')
+        print(f'This model was trained for {ts if ts != None else '???'} timestamps')
+        return ts
     
     def _print_stats(self, batch_steps, batch_rews, batch_lens, batch_n = None):
 
