@@ -89,6 +89,8 @@ if __name__ == "__main__":
 
         # Save batch data in log file to make graphs after training
         avg_reward = float(sum(sum(ep_rews) for ep_rews in batch_rews) / len(batch_rews))
+        max_reward = float(max(sum(ep_rews) for ep_rews in batch_rews))
+        min_reward = float(min(sum(ep_rews) for ep_rews in batch_rews))
         avg_ep_len = float(sum(batch_lens) / len(batch_lens))
 
         log_data = {
@@ -96,7 +98,11 @@ if __name__ == "__main__":
             'timesteps_so_far': int(t_so_far),
             'batch_steps': int(total_batch_steps),
             'avg_reward': avg_reward,
+            'max_reward': max_reward,
+            'min_reward': min_reward,
             'avg_episode_length': avg_ep_len,
+            'max_episode_length': int(max(batch_lens)),
+            'min_episode_length': int(min(batch_lens)),
         }
 
         if not training_logs_first_entry:
@@ -188,7 +194,7 @@ if __name__ == "__main__":
     # Save final model
     print('Saving final model...')
 
-    agent.save(model_name='final_model')
+    agent.save(file_name='final_model')
 
     print('Final model saved!')
     print('Training completed')
