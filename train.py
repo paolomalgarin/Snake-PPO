@@ -152,7 +152,7 @@ if __name__ == "__main__":
         # =============== SAVE CHECKPOINT ===============
         if t_so_far % CHECKPOINT_INTERVAL < total_batch_steps and t_so_far != TRAINING_TIMESTAMPS:
             clean_checkpoint_number = int(t_so_far / CHECKPOINT_INTERVAL) * CHECKPOINT_INTERVAL
-            agent.save(t_so_far, path=os.path.join('resoults', 'checkpoints'), file_name=f'checkpoint_{clean_checkpoint_number:,}.pth')
+            agent.save(total_timesteps=t_so_far, path=os.path.join('resoults', 'checkpoints'), file_name=f'checkpoint_{clean_checkpoint_number:,}.pth')
         
         # =============== VISUALIZE GAME ===============
         if t_so_far % VISUALIZE_FREQUENCY < total_batch_steps:
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     # Save final model
     print('Saving final model...')
 
-    agent.save(file_name='final_model')
+    agent.save(total_timesteps=t_so_far, file_name='final_model.pth')
 
     print('Final model saved!')
     print('Training completed')

@@ -264,7 +264,7 @@ class PPOAgent:
 
     def load(self, path, device=None, load_optimizers=True):
         # Fetch the states
-        checkpoint = torch.load(path, map_location=device)
+        checkpoint = torch.load(path, map_location=device, weights_only=False)
 
         # Load actor and critic
         self.actor.load_state_dict(checkpoint['actor_state_dict'])
@@ -277,9 +277,9 @@ class PPOAgent:
             self.critic_optim.load_state_dict(checkpoint['critic_optim_state_dict'])
 
         # Returns model's timestamps
-        ts = checkpoint.get('timestamps_trained', None)
+        ts = checkpoint.get('timesteps_trained', None)
         print('Model loaded successfully!')
-        print(f'This model was trained for {ts if ts != None else "???"} timestamps')
+        print(f'This model was trained for {f"{ts:,}" if ts != None else "???"} timestamps')
         return ts
     
     def _print_stats(self, batch_steps, batch_rews, batch_lens, batch_n = None):
