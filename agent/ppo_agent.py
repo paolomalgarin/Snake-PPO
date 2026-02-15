@@ -279,7 +279,7 @@ class PPOAgent:
         # Returns model's timestamps
         ts = checkpoint.get('timestamps_trained', None)
         print('Model loaded successfully!')
-        print(f'This model was trained for {ts if ts != None else '???'} timestamps')
+        print(f'This model was trained for {ts if ts != None else "???"} timestamps')
         return ts
     
     def _print_stats(self, batch_steps, batch_rews, batch_lens, batch_n = None):

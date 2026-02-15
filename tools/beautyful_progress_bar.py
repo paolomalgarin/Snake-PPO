@@ -1,11 +1,23 @@
 import atexit
+from rich.text import Text
 from rich.progress import (
     Progress,
     BarColumn,
     TextColumn,
     TimeElapsedColumn,
     TimeRemainingColumn,
+    ProgressColumn,
+    Task
 )
+
+class SpeedColumn(ProgressColumn):
+    def render(self, task: "Task") -> Text:
+        speed = task.speed
+        if speed is None:
+            return Text("? it/s", style="progress.data.speed")
+        
+        return Text(f"{speed:,.0f} it/s", style="progress.data.speed")
+
 
 class PBar:
 
@@ -66,6 +78,7 @@ class PBar:
             TimeRemainingColumn(),
             # Closed braket
             TextColumn("]"),
+            SpeedColumn(),
         ]
         self.pbar = Progress(*colonne)
         self.task_id = self.pbar.add_task("", total=total)

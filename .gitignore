@@ -1,6 +1,7 @@
 __pycache__/
 .venv/
+debug/sb3_logs/
 resoults/checkpoints/
 resoults/config/
-resoults/final_model.pth
-debug/sb3_logs/
+resoults/logs/
+resoults/model/
