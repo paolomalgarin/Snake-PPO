@@ -112,35 +112,35 @@ class SnakeEnv(Env):
         reward = 0
 
 
-        # +0.1 if gets closer to food, -0.1 if gets furder from food
-        new_food_distance = self.game.getFoodDistance()
+        # # +0.1 if gets closer to food, -0.1 if gets furder from food
+        # new_food_distance = self.game.getFoodDistance()
 
-        if self.game.score == self.prev_score:  # avoids giving penalities immediatly after the snake eat
-            if new_food_distance < self.prev_food_distance:
-                # reward += 0.1
-                pass
-            else:
-                # reward -= 0.18
-                reward -= 0.3
+        # if self.game.score == self.prev_score:  # avoids giving penalities immediatly after the snake eat
+        #     if new_food_distance < self.prev_food_distance:
+        #         # reward += 0.1
+        #         pass
+        #     else:
+        #         # reward -= 0.18
+        #         reward -= 0.3
 
-        self.prev_food_distance = new_food_distance
+        # self.prev_food_distance = new_food_distance
         
         # +10 if eats food (and add more steps)
         if self.game.score > self.prev_score:
             self.prev_score = self.game.score
-            reward += 10
+            reward += 1
             
-            # Flush the anti-circling buffer
-            self.loopBuffer.clear()
+            # # Flush the anti-circling buffer
+            # self.loopBuffer.clear()
 
         
-        # penality for circling
-        if(self.game.head in self.loopBuffer):
-            reward -= 0.2
+        # # penality for circling
+        # if(self.game.head in self.loopBuffer):
+        #     reward -= 0.2
 
         # -10 if dies
         if self.game.isGameOver:
-            reward = -11
+            reward = -1
 
         return float(reward)
 

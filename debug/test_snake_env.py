@@ -24,7 +24,7 @@ config = {
     "n_steps": 2048,  # number of steps per update
     "verbose": 1,
 }
-STEPS = 2e6  # Training steps (actions taken)
+STEPS = 10e6  # Training steps (actions taken)
 EVAL_FREQ = 500  # Evaluation frequency
 SAVE_FREQ = 1e6  # Model saving frequency
 VISUALIZE_FREQUENCY = 50  # Interval between games (played by the model) shown

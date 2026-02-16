@@ -1,7 +1,4 @@
 __pycache__/
 .venv/
 debug/sb3_logs/
-resoults/checkpoints/
-resoults/config/
-resoults/logs/
-resoults/model/
+resoults/
