@@ -40,7 +40,7 @@ class Point(NamedTuple):
 
 class SnakeGame:
     
-    def __init__(self, gridW: int = 15, gridH: int = 15, useGui = False, windowHeight = 680):
+    def __init__(self, gridW: int = 10, gridH: int = 10, useGui = False, windowHeight = 680):
         self.gridWidth = gridW
         self.gridHeight = gridH
 

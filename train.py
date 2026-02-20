@@ -8,7 +8,7 @@ from torch import nn
 
 TRAINING_TIMESTAMPS = 2_000_000  # Number of timestamps the model will be trained for
 CHECKPOINT_INTERVAL = 500_000  # Number of steps between checkpoint saves
-VISUALIZE_FREQUENCY = 100_000  # Number of steps after wich the agent will be playing a live game, to see how it's doing
+VISUALIZE_FREQUENCY = 500_000  # Number of steps after wich the agent will be playing a live game, to see how it's doing
 
 
 if __name__ == "__main__":
@@ -155,7 +155,8 @@ if __name__ == "__main__":
             agent.save(total_timesteps=t_so_far, path=os.path.join('resoults', 'checkpoints'), file_name=f'checkpoint_{clean_checkpoint_number:,}.pth')
         
         # =============== VISUALIZE GAME ===============
-        if t_so_far % VISUALIZE_FREQUENCY < total_batch_steps:
+        # N.B.: This visualize also the first batch to show the starting point (to avoid it delete 'or t_so_far == total_batch_steps')
+        if t_so_far % VISUALIZE_FREQUENCY < total_batch_steps or t_so_far == total_batch_steps:
             stop = False
             tot_reward = 0
             obs, info = env.reset()

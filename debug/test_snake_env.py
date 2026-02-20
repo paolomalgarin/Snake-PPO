@@ -3,6 +3,8 @@
 import gymnasium as gym
 
 import os, time, sys, torch
+import torch.nn as nn
+from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
 from pathlib import Path
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
@@ -10,6 +12,54 @@ from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.callbacks import EvalCallback, CheckpointCallback
 from stable_baselines3.common.monitor import Monitor
 from env.snake_env import SnakeEnv
+
+
+
+
+class SmallCNN(BaseFeaturesExtractor):
+
+    def __init__(self, observation_space: gym.spaces.Box, features_dim: int = 128):
+        super().__init__(observation_space, features_dim)
+        
+        input_channels = observation_space.shape[0]
+        
+        
+        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+        
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))
+        
+        self.fc = nn.Linear(64, 32)
+        self.fc2 = nn.Linear(32, features_dim)
+
+    def forward(self, obs: torch.Tensor) -> torch.Tensor:
+        x = self.conv1(obs)
+        x = self.relu(x)
+        x = self.pool(x)
+
+        x = self.conv2(x)
+        x = self.relu(x)
+        x = self.pool(x)
+
+        x = self.conv3(x)
+        x = self.relu(x)
+        x = self.pool(x)
+
+        x = self.adaptive_pool(x)
+        x = x.view(x.size(0), -1)
+
+        x = self.fc(x)
+        x = self.fc2(x)
+
+        return x
+
+
+
+
+
 
 # ================ CONFIGS ================
 config = {
@@ -25,10 +75,6 @@ config = {
     "verbose": 1,
 }
 STEPS = 10e6  # Training steps (actions taken)
-EVAL_FREQ = 500  # Evaluation frequency
-SAVE_FREQ = 1e6  # Model saving frequency
-VISUALIZE_FREQUENCY = 50  # Interval between games (played by the model) shown
-BUFFER_SIZE = 2048  # Number of stepls the model plays before learning
 
 
 if __name__ == "__main__":
@@ -41,11 +87,12 @@ if __name__ == "__main__":
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = PPO(
-        "MlpPolicy",  # Using MLP policy for 1D observation
+        "CnnPolicy",    
         env,
         policy_kwargs=dict(
-            net_arch=[128 * 3, 128, 128, 32]
-        ),  # 2 hidden layers of 128 neurons
+            features_extractor_class=SmallCNN,
+            normalize_images=False,
+        ),
         device=device,
         **config,
     )
@@ -66,15 +113,6 @@ if __name__ == "__main__":
     env.close()
 
     # =============== TESTING TRAINED MODEL ===============
-    print("\n=== Testing Trained Model ===")
-
-    # Load the best model (or use final model)
-    # best_model_path = "debug/sb3_logs/best_model/best_model.zip"
-    # if os.path.exists(best_model_path):
-    #     model = PPO.load(best_model_path)
-    # else:
-    #     model = PPO.load("debug/sb3_logs/final_model.zip")
-    
 
     # Visualize a game
     env = SnakeEnv(False)

@@ -6,20 +6,16 @@ from env.snake_game import SnakeGame, Point, Direction
 
 
 class SnakeEnv(Env):
-    ACTION_LENGTH = 3
-    OBS_LENGTH = 679
 
     def __init__(self, useGui = False):
         self.game = SnakeGame(useGui=useGui)
         self.useGui = useGui
         self.game.reset()
         self.action_space = spaces.Discrete(
-            3
-        )  # 3 actions: move forward, turn right, turn left
-        # OBS_LENGTH: array 1D with the entire grid 3 times (food, body, head) + the direction (4)
-        self.OBS_LENGTH = self.game.gridHeight * self.game.gridWidth * 3 + 4
+            4
+        )  # 3 actions: up, down, right, left
         self.observation_space = spaces.Box(
-            low=0, high=1, shape=(self.OBS_LENGTH,), dtype=np.float32
+            low=0, high=1, shape=(3, self.game.gridHeight, self.game.gridWidth), dtype=np.float32
         )
         self.max_steps = self.game.gridHeight * self.game.gridWidth * 10
         self.prev_score = self.game.score
@@ -46,14 +42,22 @@ class SnakeEnv(Env):
         # Add the OLD position in the anti-circling buffer
         self.loopBuffer.append(self.game.head)
 
-        # 3 actions: 0 = move forward, 1 = turn right, 2 = turn left
+        # 4 actions: 0 = up, 1 = down, 2 = right, 3 = left
         match action:
+            # case 0:
+            #     newDir = self.game.direction
+            # case 1:
+            #     newDir = self.game.direction.getRightTurn()
+            # case 2:
+            #     newDir = self.game.direction.getRightTurn().getOpposite()
             case 0:
-                newDir = self.game.direction
+                newDir = Direction.UP
             case 1:
-                newDir = self.game.direction.getRightTurn()
+                newDir = Direction.DOWN
             case 2:
-                newDir = self.game.direction.getRightTurn().getOpposite()
+                newDir = Direction.RIGHT
+            case 3:
+                newDir = Direction.LEFT
 
         self.game.changeDir(newDir)
         self.game.move()
@@ -79,32 +83,27 @@ class SnakeEnv(Env):
         self.game.close()
 
     def _get_obs(self):
-        grid = np.zeros((self.OBS_LENGTH,), dtype=np.float32)
+        grid = np.zeros((self.observation_space.shape), dtype=np.float32)
 
-        gridLength = self.game.gridWidth * self.game.gridHeight
-        bodyGridStart = 0
-        headGridStart = gridLength
-        foodGridStart = gridLength * 2
-        directionStart = gridLength * 3
 
         for row in range(self.game.gridHeight):
             for col in range(self.game.gridWidth):
                 currentPoint = Point(col, row)
 
-                if currentPoint in self.game.body:
-                    grid[bodyGridStart + row * self.game.gridWidth + col] = 1.0
-                elif currentPoint == self.game.head:
-                    grid[headGridStart + row * self.game.gridWidth + col] = 1.0
+                if currentPoint == self.game.head:
+                    grid[0][row][col] = 1.0
+                elif currentPoint in self.game.body:
+                    grid[1][row][col] = 1.0
                 elif currentPoint == self.game.food:
-                    grid[foodGridStart + row * self.game.gridWidth + col] = 1.0
+                    grid[2][row][col] = 1.0
 
-        direction_mapping = {
-            Direction.UP: 0,
-            Direction.DOWN: 1,
-            Direction.LEFT: 2,
-            Direction.RIGHT: 3,
-        }
-        grid[directionStart + direction_mapping[self.game.direction]] = 1.0
+        # direction_mapping = {
+        #     Direction.UP: 0,
+        #     Direction.DOWN: 1,
+        #     Direction.LEFT: 2,
+        #     Direction.RIGHT: 3,
+        # }
+        # grid[directionStart + direction_mapping[self.game.direction]] = 1.0
 
         return grid
 
@@ -139,8 +138,8 @@ class SnakeEnv(Env):
         #     reward -= 0.2
 
         # -10 if dies
-        if self.game.isGameOver:
-            reward = -1
+        # if self.game.isGameOver:
+        #     reward = -1
 
         return float(reward)
 

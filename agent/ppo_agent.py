@@ -11,12 +11,17 @@ class FeedForwardNN(nn.Module):
 
     def __init__(self, obs_dim, action_dim):
         super().__init__()
-
-        self.input_layer = nn.Linear(obs_dim, 128*3)
-        self.hidden_layer1 = nn.Linear(128*3, 128)
-        self.hidden_layer2 = nn.Linear(128, 128)
-        self.hidden_layer3 = nn.Linear(128, 32)
+        
+        self.conv1 = nn.Conv2d(obs_dim, 32, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1)
+        
         self.relu = nn.ReLU()
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.adaptive_pool = nn.AdaptiveAvgPool2d((1, 1))
+        
+        self.fc = nn.Linear(64, 32)
+        self.fc2 = nn.Linear(32, 32)
         
         self.policy_head = nn.Linear(32, action_dim)
         self.value_head = nn.Linear(32, 1)
@@ -25,18 +30,27 @@ class FeedForwardNN(nn.Module):
         # Convert observation to tensor if it's a numpy array
         if isinstance(obs, np.ndarray):
             obs = torch.tensor(obs, dtype=torch.float)
+        
+        x = self.conv1(obs)
+        x = self.relu(x)
+        x = self.pool(x)
 
-        x = self.input_layer(obs)
+        x = self.conv2(x)
         x = self.relu(x)
-        x = self.hidden_layer1(x)
+        x = self.pool(x)
+
+        x = self.conv3(x)
         x = self.relu(x)
-        x = self.hidden_layer2(x)
-        x = self.relu(x)
-        x = self.hidden_layer3(x)
-        x = self.relu(x)
+        x = self.pool(x)
+
+        x = self.adaptive_pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        x = self.fc2(x)
 
         logits = self.policy_head(x)
         value = self.value_head(x)
+
         return logits, value
 
 
@@ -194,6 +208,14 @@ class PPOAgent:
         return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_rews, batch_lens
 
     def get_action(self, obs):
+        # Convert to tensor
+        if isinstance(obs, np.ndarray):
+            obs = torch.tensor(obs, dtype=torch.float32)
+
+        # Add batch dimention to obs if not already added to perform convolutions without errors
+        if obs.dim() == 3:
+            obs = obs.unsqueeze(0) 
+
         # Query the actor network for a mean action
         mean, _ = self.actor.forward(obs)
 
@@ -210,7 +232,7 @@ class PPOAgent:
         # of the graph and just convert the action to numpy array.
         # log prob as tensor is fine. Our computation graph will
         # start later down the line.
-        return action.detach().numpy(), log_prob.detach()
+        return action.detach().numpy(), log_prob.squeeze(0).detach()
 
     def compute_rtgs(self, batch_rewards):
         # Calculate the rewards-to-go (rtg) per episode per batch to return
