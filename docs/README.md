@@ -1,17 +1,18 @@
 ![image](./img/static-logo-alt.png)
 
-<br >
+<br>
+<br>
 
 
 # 📖 INDEX:
  * 📌 [Project Overview](#-project-overview)
- * 🤖 [Model Structure](#-model-structure)
- * reward system
- * model input
- * project structure
- * train (with params explained)
- * play (with params explained)
- * debug scripts
+ * 🧱 [Model Structure](#-model-structure)
+ * 🍓 [Reward System](#-reward-system)
+ * 👀 [Model Input](#-model-input)
+ * 🚀 [Project Structure](#-project-structure)
+    * 💪 [Train](#-train)
+    * 🎮 [Play](#-play)
+    * 📊 [Debug Scripts](#-debug-scripts)
  * 🤝 [Credits](#-credits)
  * 📄 [Licence](#-licence)
 
@@ -38,7 +39,37 @@ This project was made to use **PPO** *(Proximal Policy Optimization)* to beat th
 <br>
 <br>
 
-# 🤖 Model Structure
+# 🍓 Reward System
+
+lorem ipsum dolor sit amet ...
+
+<br>
+<br>
+
+# 👀 Model Input
+
+lorem ipsum dolor sit amet ...
+
+<br>
+<br>
+
+# 🚀 Project Structure
+
+lorem ipsum dolor sit amet ...
+
+ - ## 🎮 Play
+    lorem ipsum dolor sit amet ...
+
+ - ## 💪 Train
+    lorem ipsum dolor sit amet ...
+
+ - ## 📊 Debug Scripts
+    lorem ipsum dolor sit amet ...
+
+<br>
+<br>
+
+# 🧱 Model Structure
 
  *Le applicazioni front-end mandano le richieste all'API che è l'unico che può comunicare con il ML grazie ad un **HMAC***
  
