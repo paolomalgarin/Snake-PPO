@@ -1,3 +1,7 @@
+![image](./img/static-logo.png)
+
+<br >
+
 > [!NOTE]  
 > Python 3.11.9 used 4 this project
 
@@ -22,6 +26,10 @@
 <br>
 
 ![image](./img/gameplays/game3.gif)
+
+
+![image](./img/reward-graph.png)
+![image](./img/ep-length-graph.png)
 
 
 
