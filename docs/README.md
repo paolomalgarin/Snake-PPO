@@ -6,12 +6,13 @@
 
 # 📖 INDEX:
  * 📌 [Project Overview](#-project-overview)
- * 🧱 [Model Structure](#-model-structure)
- * 🍓 [Reward System](#-reward-system)
+ * 🌐 [Model Structure](#-model-structure)
+ * 🥇 [Reward System](#-reward-system)
  * 👀 [Model Input](#-model-input)
  * 🚀 [Project Structure](#-project-structure)
-    * 💪 [Train](#-train)
     * 🎮 [Play](#-play)
+    * 💪 [Train](#-train)
+    * 📈 [Plot](#-plot)
     * 📊 [Debug Scripts](#-debug-scripts)
  * 🤝 [Credits](#-credits)
  * 📄 [Licence](#-licence)
@@ -35,11 +36,19 @@ This project was made to use **PPO** *(Proximal Policy Optimization)* to beat th
 ![image](./img/reward-graph.png)
 ![image](./img/ep-length-graph.png)
 
+<br>
+<br>
+
+# 🌐 Model Structure
+
+ *Le applicazioni front-end mandano le richieste all'API che è l'unico che può comunicare con il ML grazie ad un **HMAC***
+ 
+
 
 <br>
 <br>
 
-# 🍓 Reward System
+# 🥇 Reward System
 
 lorem ipsum dolor sit amet ...
 
@@ -49,6 +58,7 @@ lorem ipsum dolor sit amet ...
 # 👀 Model Input
 
 lorem ipsum dolor sit amet ...
+![image](./img/observations-alt.png)
 
 <br>
 <br>
@@ -61,19 +71,34 @@ lorem ipsum dolor sit amet ...
     lorem ipsum dolor sit amet ...
 
  - ## 💪 Train
+    lorem ipsum dolor sit amet ...  
+    ```json
+    {  
+        "agent": {  
+            "timestamps_per_batch": 4800,  
+            "max_timestamps_per_episode": 1600,  
+            "gamma": 0.95,  
+            "n_updates_per_iteration": 5,  
+            "clip": 0.2,  
+            "lr": 0.0003  
+        },  
+        "env": {  
+            "max_steps": 1000,  
+            "obs_shape": [  
+                3,  
+                10,  
+                10  
+            ],  
+            "action_shape": [ 4 ]  
+        }  
+    }
+    ```
+
+ - ## 📈 Plot
     lorem ipsum dolor sit amet ...
 
  - ## 📊 Debug Scripts
     lorem ipsum dolor sit amet ...
-
-<br>
-<br>
-
-# 🧱 Model Structure
-
- *Le applicazioni front-end mandano le richieste all'API che è l'unico che può comunicare con il ML grazie ad un **HMAC***
- 
-![image](./img/observations-alt.png)
 
 <br>
 <br>
