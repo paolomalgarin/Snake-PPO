@@ -1,5 +1,9 @@
 ![image](./img/static-logo-alt.png)
 
+<p align=center>
+*Using PPO to beat snake.*
+</p>
+
 <br>
 <br>
 
@@ -9,6 +13,7 @@
  * 🌐 [Model Structure](#-model-structure)
  * 🥇 [Reward System](#-reward-system)
  * 👀 [Model Input](#-model-input)
+ * 🎖️ [Resoults](#️-resoults)
  * 🚀 [Project Structure](#-project-structure)
     * 🎮 [Play](#-play)
     * 💪 [Train](#-train)
@@ -27,14 +32,20 @@
 # 📌 Project Overview
 
 > [!NOTE]  
-> Python 3.11.9 used 4 this project
+> Python 3.12 was used for this project
 
 
-This project was made to use **PPO** *(Proximal Policy Optimization)* to beat the game of [**snake**](https://en.wikipedia.org/wiki/Snake_(video_game_genre))
+This project was made with the goal of using [**PPO**](https://en.wikipedia.org/wiki/Proximal_policy_optimization) *(Proximal Policy Optimization)* to beat the game of [**snake**](https://en.wikipedia.org/wiki/Snake_(video_game_genre)).   
+The main goal was to train a reinforcement learning agent capable of learning the game from scratch.  
+Along the way, this project became a deep dive into PPO: understanding how it works, tuning hyperparameters, stabilizing training, and analyzing learning behavior through metrics. 
+
+> Here is a gameplay demo of the final agent trained for 2M timesteps  
+> (You can find the model in `/agent/pretrained_model.pth`)
+<p align=center>
 
 ![image](./img/gameplays/game3.gif)
-![image](./img/reward-graph.png)
-![image](./img/ep-length-graph.png)
+</p>
+
 
 <br>
 <br>
@@ -59,6 +70,17 @@ lorem ipsum dolor sit amet ...
 
 lorem ipsum dolor sit amet ...
 ![image](./img/observations-alt.png)
+
+<br>
+<br>
+
+# 🎖️ Resoults
+
+Here are the resoults:
+
+![image](./img/graphs/reward-graph.png)
+![image](./img/graphs/ep-length-graph.png)
+
 
 <br>
 <br>
