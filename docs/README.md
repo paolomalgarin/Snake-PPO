@@ -53,7 +53,11 @@ Along the way, this project became a deep dive into PPO: understanding how it wo
 
 # 🌐 Model Structure
 
-The **ActorCritic** model is made of a **CNN** with 3 conv layers...
+The `ppo_agent.py` file contains 2 classes:
+- The **PPOAgent** class, wich contains an implementation of the PPO algorithm
+- The **FeedForwardNN** class, wich is the **ActorCritic** model
+
+The **ActorCritic** model is made of a **CNN** with 3 convolutional layers that goes from 32 features to 64 and 2 fully connected layers of 32 neurons each
  
 
 
