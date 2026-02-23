@@ -59,7 +59,7 @@ The `ppo_agent.py` file contains 2 classes:
 
 The **ActorCritic** model is made of a **CNN** with 3 convolutional layers that goes from 32 features to 64 and 2 fully connected layers of 32 neurons each
  
-![image](./img/ActorCritic/ActorCritic-alt.svg)
+![image](./img/ActorCritic/ActorCritic-alt-2.svg)
 
 
 <br>
