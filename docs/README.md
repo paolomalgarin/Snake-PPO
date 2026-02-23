@@ -1,8 +1,14 @@
 ![image](./img/static-logo-alt.png)
 
 <p align=center>
-*Using PPO to beat snake.*
+   <i>Using PPO to beat snake.</i>
 </p>
+<br>
+  
+> [!NOTE]  
+> Python 3.12 was used for this project
+
+
 
 <br>
 <br>
@@ -11,7 +17,7 @@
 # 📖 INDEX:
  * 📌 [Project Overview](#-project-overview)
  * 🌐 [Model Structure](#-model-structure)
- * 🥇 [Reward System](#-reward-system)
+ * 🥇 [Reward Shaping](#-reward-shaping)
  * 👀 [Model Input](#-model-input)
  * 🎖️ [Resoults](#️-resoults)
  * 🚀 [Project Structure](#-project-structure)
@@ -31,37 +37,33 @@
 
 # 📌 Project Overview
 
-> [!NOTE]  
-> Python 3.12 was used for this project
-
-
 This project was made with the goal of using [**PPO**](https://en.wikipedia.org/wiki/Proximal_policy_optimization) *(Proximal Policy Optimization)* to beat the game of [**snake**](https://en.wikipedia.org/wiki/Snake_(video_game_genre)).   
 The main goal was to train a reinforcement learning agent capable of learning the game from scratch.  
 Along the way, this project became a deep dive into PPO: understanding how it works, tuning hyperparameters, stabilizing training, and analyzing learning behavior through metrics. 
 
-> Here is a gameplay demo of the final agent trained for 2M timesteps  
+> Here is a gameplay demo of the final agent trained for 20M timesteps  
 > (You can find the model in `/agent/pretrained_model.pth`)
+
 <p align=center>
-
-![image](./img/gameplays/game3.gif)
+   <img src="./img/gameplays/game3.gif" alt='gameplay'>
 </p>
-
 
 <br>
 <br>
 
 # 🌐 Model Structure
 
- *Le applicazioni front-end mandano le richieste all'API che è l'unico che può comunicare con il ML grazie ad un **HMAC***
+The **ActorCritic** model is made of a **CNN** with 3 conv layers...
  
 
 
 <br>
 <br>
 
-# 🥇 Reward System
+# 🥇 Reward Shaping
 
-lorem ipsum dolor sit amet ...
+The reward shaping is quite simple: **only +1 if the snake eats** food and when the snake dies, it simply starts a new game.  
+This reward shaping might seem too sparse for PPO but out all the rewards shaping I've tryied, it performed the best.
 
 <br>
 <br>
@@ -125,9 +127,8 @@ lorem ipsum dolor sit amet ...
 <br>
 <br>
 
-# 🤝 Thanks
-SPECIAL THANKS TO:
- [Eric Yang Yu](https://ericyangyu.github.io/) for the PPO [tutorial](https://medium.com/analytics-vidhya/coding-ppo-from-scratch-with-pytorch-part-1-4-613dfc1b14c8) and [Ettore](https://sa1g.github.io) for helping me in general.
+# 🤝 Credits
+Special thanks to [Eric Yang Yu](https://ericyangyu.github.io/) for the [PPO tutorial](https://medium.com/analytics-vidhya/coding-ppo-from-scratch-with-pytorch-part-1-4-613dfc1b14c8) and [Ettore](https://sa1g.github.io) for helping me in general.
 
 
 <br>
