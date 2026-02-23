@@ -68,7 +68,7 @@ The **ActorCritic** model is made of a **CNN** with 3 convolutional layers that 
 # 🥇 Reward Shaping
 
 The reward shaping is quite simple: **only +1 if the snake eats** food and when the snake dies, it simply starts a new game.  
-This reward shaping might seem too sparse for PPO but out all the rewards shaping I've tryied, it performed the best.
+This reward shaping might seem too sparse for PPO but out of all the rewards shaping I've tryied, it performed the best.
 
 <br>
 <br>
