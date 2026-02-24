@@ -87,10 +87,12 @@ After training the model for 20M timesteps, here are the resoults:
 
 > This is the reward graph, wich shows the model learning and gatting more reward.  
 > This is also the score graph since score and reward coincide.
+
 ![image](./img/graphs/reward-graph.png)
   
 > This is the episode length graph.
 > It represents the duration of the games during training.
+
 ![image](./img/graphs/ep-length-graph.png)
 
 
