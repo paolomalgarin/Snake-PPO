@@ -82,8 +82,7 @@ In this project the shape is (3, 10, 10):
 - Channel 2 → Food position  
   
 Each channel is a binary grid (0 or 1) aligned with the game board.
-Before being passed to the network, the observation is converted to float32  
-and batched to shape (N, 3, 10, 10) for PyTorch.
+Before being passed to the network, the observation is batched to shape (N, 3, 10, 10) for PyTorch.
 
 ![image](./img/observations-alt.png)
 
