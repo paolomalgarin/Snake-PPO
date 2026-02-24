@@ -77,9 +77,9 @@ This reward shaping might seem too sparse for PPO but out of all the rewards sha
 
 The agent receives an observation tensor of shape (C, H, W) directly from the environment.  
 In this project the shape is (3, 10, 10):  
-	•	Channel 0 → Snake head position  
-	•	Channel 1 → Snake body (tail) positions  
-	•	Channel 2 → Food position  
+-	Channel 0 → Snake head position  
+- Channel 1 → Snake body (tail) positions  
+- Channel 2 → Food position  
   
 Each channel is a binary grid (0 or 1) aligned with the game board.
 Before being passed to the network, the observation is converted to float32  
