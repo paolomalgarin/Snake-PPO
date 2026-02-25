@@ -111,10 +111,27 @@ After training the model for 20M timesteps, here are the resoults:
 
 <br>
 
+**`train.py`**: the script where you can train the model.  
+*(If you wonna make another training script, you can simply use `model.learn(timesteps)`)*  
+Params:  
+```py
+--train-ts 20_000_000  # Number of timestamps the model will be trained for
+```
+```py
+--ci 50_000  # Number of steps between checkpoint saves
+```
+```py
+--vf 500  # Number of steps after wich the agent will be playing a live game, to see how it's doing
+```
+
+<br>
+
+---
+
 **`play.py`**: the script where you can test the trained model once training is completed.  
 Params:  
 ```py
---path str  # Path to the model file (file name included). It can be both absolute or relative to project\'s root folder
+--path str  # Path to the model file (file name included). It can be both absolute or relative to project's root folder
 ```
 ```py
 --disable-gui  # No value needed, deactivates the gui on the environment (it will use the cli)
