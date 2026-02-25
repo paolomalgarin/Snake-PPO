@@ -21,10 +21,6 @@
  * 👀 [Model Input](#-model-input)
  * 🎖️ [Resoults](#️-resoults)
  * 🚀 [Project Structure](#-project-structure)
-    * 🎮 [Play](#-play)
-    * 💪 [Train](#-train)
-    * 📈 [Plot](#-plot)
-    * 📊 [Debug Scripts](#-debug-scripts)
  * 🤝 [Credits](#-credits)
  * 📄 [Licence](#-licence)
 
@@ -103,6 +99,29 @@ After training the model for 20M timesteps, here are the resoults:
 
 ![image](./img/graphs/ep-length-graph.png)
 
+> Those are the configurations used during training.
+ ```json
+ {  
+     "agent": {  
+         "timestamps_per_batch": 4800,  
+         "max_timestamps_per_episode": 1600,  
+         "gamma": 0.95,  
+         "n_updates_per_iteration": 5,  
+         "clip": 0.2,  
+         "lr": 0.0003  
+     },  
+     "env": {  
+         "max_steps": 1000,  
+         "obs_shape": [  
+             3,  
+             10,  
+             10  
+         ],  
+         "action_shape": [ 4 ]  
+     }  
+ }
+ ```
+
 
 <br>
 <br>
@@ -131,7 +150,7 @@ Params:
 **`play.py`**: the script where you can test the trained model once training is completed.  
 Params:  
 ```py
---path str  # Path to the model file (file name included). It can be both absolute or relative to project's root folder
+--path "agent\pretrained_model.pth"  # Path to the model file (file name included). It can be both absolute or relative to project's root folder
 ```
 ```py
 --disable-gui  # No value needed, deactivates the gui on the environment (it will use the cli)
@@ -141,38 +160,10 @@ Params:
 
 ---
 
- - ## 🎮 Play
-    lorem ipsum dolor sit amet ...
+**`plot.py`**: the script where you can plot the data collected automatically from training.  
+*(no params)*
 
- - ## 💪 Train
-    lorem ipsum dolor sit amet ...  
-    ```json
-    {  
-        "agent": {  
-            "timestamps_per_batch": 4800,  
-            "max_timestamps_per_episode": 1600,  
-            "gamma": 0.95,  
-            "n_updates_per_iteration": 5,  
-            "clip": 0.2,  
-            "lr": 0.0003  
-        },  
-        "env": {  
-            "max_steps": 1000,  
-            "obs_shape": [  
-                3,  
-                10,  
-                10  
-            ],  
-            "action_shape": [ 4 ]  
-        }  
-    }
-    ```
 
- - ## 📈 Plot
-    lorem ipsum dolor sit amet ...
-
- - ## 📊 Debug Scripts
-    lorem ipsum dolor sit amet ...
 
 <br>
 <br>
