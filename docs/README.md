@@ -75,14 +75,14 @@ This reward shaping might seem too sparse for PPO but out of all the rewards sha
 
 # 👀 Model Input
 
-The agent receives an observation tensor of shape (C, H, W) directly from the environment.  
+The agent receives an observation tensor of shape **(C, H, W)** directly from the environment.  
 In this project the shape is (3, 10, 10):  
--	Channel 0 → Snake head position  
-- Channel 1 → Snake body (tail) positions  
-- Channel 2 → Food position  
+-	Channel 0 → Snake **head** position  
+- Channel 1 → Snake **tail** positions  
+- Channel 2 → **Food** position  
   
-Each channel is a binary grid (0 or 1) aligned with the game board.
-Before being passed to the network, the observation is batched to shape (N, 3, 10, 10) for PyTorch.
+*Each channel is a binary grid (0 or 1) aligned with the game board.  
+Before being passed to the network, the observation is batched to shape (N, 3, 10, 10) for PyTorch.*
 
 ![image](./img/observations-alt.png)
 
@@ -93,7 +93,7 @@ Before being passed to the network, the observation is batched to shape (N, 3, 1
 
 After training the model for 20M timesteps, here are the resoults:
 
-> This is the reward graph, wich shows the model learning and gatting more reward.  
+> This is the reward graph, wich shows the model learning and getting more reward.  
 > This is also the score graph since score and reward coincide.
 
 ![image](./img/graphs/reward-graph.png)
@@ -107,9 +107,22 @@ After training the model for 20M timesteps, here are the resoults:
 <br>
 <br>
 
-# 🚀 Project Structure
+# 🚀 Project Structure  
 
-lorem ipsum dolor sit amet ...
+<br>
+
+**`play.py`**: the script where you can test the trained model once training is completed.  
+Params:  
+```py
+--path str  # Path to the model file (file name included). It can be both absolute or relative to project\'s root folder
+```
+```py
+--disable-gui  # No value needed, deactivates the gui on the environment (it will use the cli)
+```
+
+<br>
+
+---
 
  - ## 🎮 Play
     lorem ipsum dolor sit amet ...
