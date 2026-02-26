@@ -6,7 +6,7 @@ import os, json, torch, time, argparse, numpy as np
 from torch import nn
 
 
-TRAINING_TIMESTAMPS = 2_000_000  # Number of timestamps the model will be trained for
+TRAINING_TIMESTEPS = 2_000_000  # Number of timesteps the model will be trained for
 CHECKPOINT_INTERVAL = 500_000  # Number of steps between checkpoint saves
 VISUALIZE_FREQUENCY = 500_000  # Number of steps after wich the agent will be playing a live game, to see how it's doing
 
@@ -22,13 +22,13 @@ if __name__ == "__main__":
     # Handle params
     parser = argparse.ArgumentParser(description='trainig arguments')
     
-    parser.add_argument('--train-ts', type=int, default=None, help='Number of timestamps the model will be trained for')
+    parser.add_argument('--train-ts', type=int, default=None, help='Number of timesteps the model will be trained for')
     parser.add_argument('--ci', type=int, default=None, help='Number of steps between checkpoint saves')
     parser.add_argument('--vf', type=int, default=None, help='Number of steps after wich the agent will be playing a live game, to see how it\'s doing')
     args = parser.parse_args()
     
     if args.train_ts is not None:
-        TRAINING_TIMESTAMPS = args.train_ts
+        TRAINING_TIMESTEPS = args.train_ts
     if args.ci is not None:
         CHECKPOINT_INTERVAL = args.ci
     if args.vf is not None:
@@ -43,8 +43,8 @@ if __name__ == "__main__":
     # Save training configurations
     config = {
         'agent': {
-            'timestamps_per_batch': agent.timestamps_per_batch,             # timesteps per batch (a batch is a number of timesteps before updating PPO's policy)
-            'max_timestamps_per_episode': agent.max_timestamps_per_episode, # timesteps per episode (an episode is a game inside the env)
+            'timesteps_per_batch': agent.timesteps_per_batch,             # timesteps per batch (a batch is a number of timesteps before updating PPO's policy)
+            'max_timesteps_per_episode': agent.max_timesteps_per_episode, # timesteps per episode (an episode is a game inside the env)
             'gamma': agent.gamma,
             'n_updates_per_iteration': agent.n_updates_per_iteration,       # Number of epoch, used to perform multiple updates on the actor and critic networks
             'clip': agent.clip,
@@ -72,9 +72,9 @@ if __name__ == "__main__":
     
     t_so_far = 0 # Timesteps simulated so far
     batch_n = 0  # Batch number
-    pbar = PBar(TRAINING_TIMESTAMPS, preset="training")
+    pbar = PBar(TRAINING_TIMESTEPS, preset="training")
     
-    while(t_so_far < TRAINING_TIMESTAMPS):
+    while(t_so_far < TRAINING_TIMESTEPS):
         batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_rews, batch_lens = agent.rollout()
         batch_n += 1
 
@@ -150,7 +150,7 @@ if __name__ == "__main__":
             agent.critic_optim.step()
 
         # =============== SAVE CHECKPOINT ===============
-        if t_so_far % CHECKPOINT_INTERVAL < total_batch_steps and t_so_far != TRAINING_TIMESTAMPS:
+        if t_so_far % CHECKPOINT_INTERVAL < total_batch_steps and t_so_far != TRAINING_TIMESTEPS:
             clean_checkpoint_number = int(t_so_far / CHECKPOINT_INTERVAL) * CHECKPOINT_INTERVAL
             agent.save(total_timesteps=t_so_far, path=os.path.join('resoults', 'checkpoints'), file_name=f'checkpoint_{clean_checkpoint_number:,}.pth')
         

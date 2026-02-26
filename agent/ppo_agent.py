@@ -143,8 +143,8 @@ class PPOAgent:
 
     def _init_hyperparameters(self):
         # Default values for hyperparameters
-        self.timestamps_per_batch = 4800        # timesteps per batch (a batch is a number of timesteps before updating PPO's policy)
-        self.max_timestamps_per_episode = 1600  # timesteps per episode (an episode is a game inside the env)
+        self.timesteps_per_batch = 4800        # timesteps per batch (a batch is a number of timesteps before updating PPO's policy)
+        self.max_timesteps_per_episode = 1600  # timesteps per episode (an episode is a game inside the env)
         self.gamma = 0.95
         self.n_updates_per_iteration = 5        # Number of epoch, used to perform multiple updates on the actor and critic networks
         self.clip = 0.2
@@ -164,7 +164,7 @@ class PPOAgent:
         t = 0
 
         # => BATCH <=
-        while t < self.timestamps_per_batch:
+        while t < self.timesteps_per_batch:
             
             # Rewards of this episode
             ep_rewards = []
@@ -173,7 +173,7 @@ class PPOAgent:
             done = False
 
             # => EPISODE <=
-            for ep_t in range(self.max_timestamps_per_episode):
+            for ep_t in range(self.max_timesteps_per_episode):
 
                 t += 1
 
@@ -305,10 +305,10 @@ class PPOAgent:
         if load_optimizers and 'critic_optim_state_dict' in checkpoint:
             self.critic_optim.load_state_dict(checkpoint['critic_optim_state_dict'])
 
-        # Returns model's timestamps
+        # Returns model's timesteps
         ts = checkpoint.get('timesteps_trained', None)
         print('Model loaded successfully!')
-        print(f'This model was trained for {f"{ts:,}" if ts != None else "???"} timestamps')
+        print(f'This model was trained for {f"{ts:,}" if ts != None else "???"} timesteps')
         return ts
     
     def _print_stats(self, batch_steps, batch_rews, batch_lens, batch_n = None):

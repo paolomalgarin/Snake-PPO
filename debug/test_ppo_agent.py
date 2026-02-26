@@ -6,7 +6,7 @@ import time, argparse
 from agent.ppo_agent import PPOAgent
 
 
-TIMESTEPS = 100_000  # Training timestamps
+TIMESTEPS = 100_000  # Training timesteps
 
 
 if __name__ == "__main__":
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # Collecting arguments
     parser = argparse.ArgumentParser(description='test_ppo_agent.py arguments')
     
-    parser.add_argument('--ts', type=int, default=None, help='Total training timestamps')
+    parser.add_argument('--ts', type=int, default=None, help='Total training timesteps')
     args = parser.parse_args()
     
     if args.ts is not None:
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     print("environment created!")
     
     # Agent hyperparameters settings
-    agent.timestamps_per_batch = 2048
+    agent.timesteps_per_batch = 2048
     
 
     # Agent training

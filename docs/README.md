@@ -6,7 +6,7 @@
 <br>
   
 > [!NOTE]  
-> Python 3.12 was used for this project
+> This project was developed using Python 3.12
 
 
 
@@ -19,10 +19,10 @@
  * 🌐 [Model Structure](#-model-structure)
  * 🥇 [Reward Shaping](#-reward-shaping)
  * 👀 [Model Input](#-model-input)
- * 🎖️ [Resoults](#️-resoults)
+ * 🎖️ [Results](#️-results)
  * 🚀 [Project Structure](#-project-structure)
  * 🤝 [Credits](#-credits)
- * 📄 [Licence](#-licence)
+ * 📄 [License](#-license)
 
 <br>
 <br>
@@ -33,7 +33,7 @@
 
 # 📌 Project Overview
 
-This project was made with the goal of using [**PPO**](https://en.wikipedia.org/wiki/Proximal_policy_optimization) *(Proximal Policy Optimization)* to beat the game of [**snake**](https://en.wikipedia.org/wiki/Snake_(video_game_genre)).   
+This project aims to use [**PPO**](https://en.wikipedia.org/wiki/Proximal_policy_optimization) *(Proximal Policy Optimization)* to beat the game of [**snake**](https://en.wikipedia.org/wiki/Snake_(video_game_genre)).   
 The main goal was to train a reinforcement learning agent capable of learning the game from scratch.  
 Along the way, this project became a deep dive into PPO: understanding how it works, tuning hyperparameters, stabilizing training, and analyzing learning behavior through metrics. 
 
@@ -50,10 +50,10 @@ Along the way, this project became a deep dive into PPO: understanding how it wo
 # 🌐 Model Structure
 
 The `ppo_agent.py` file contains 2 classes:
-- The **PPOAgent** class, wich contains an implementation of the PPO algorithm
-- The **FeedForwardNN** class, wich is the **ActorCritic** model
+- The **PPOAgent** class, which contains an implementation of the PPO algorithm
+- The **FeedForwardNN** class, which is the **ActorCritic** model
 
-The **ActorCritic** model is made of a **CNN** with 3 convolutional layers that goes from 32 features to 64 and 2 fully connected layers of 32 neurons each
+The **ActorCritic** model consists of a **CNN** with convolutional layers increasing from 32 to 64 feature maps and 2 fully connected layers of 32 neurons each
  
 ![image](./img/ActorCritic/ActorCritic-alt-2.svg)
 
@@ -63,8 +63,8 @@ The **ActorCritic** model is made of a **CNN** with 3 convolutional layers that 
 
 # 🥇 Reward Shaping
 
-The reward shaping is quite simple: **only +1 if the snake eats** food and when the snake dies, it simply starts a new game.  
-This reward shaping might seem too sparse for PPO but out of all the rewards shaping I've tryied, it performed the best.
+The reward function is intentionally minimal: **only +1 if the snake eats** food and when the snake dies, it simply starts a new game.  
+This reward shaping might seem too sparse for PPO, but out of all the rewards shaping I've tried, it performed the best.
 
 <br>
 <br>
@@ -85,11 +85,11 @@ Before being passed to the network, the observation is batched to shape (N, 3, 1
 <br>
 <br>
 
-# 🎖️ Resoults
+# 🎖️ Results
 
-After training the model for 20M timesteps, here are the resoults:
+After training the model for 20M timesteps, here are the results:
 
-> This is the reward graph, wich shows the model learning and getting more reward.  
+> This is the reward graph, which shows the model learning and getting more reward.  
 > This is also the score graph since score and reward coincide.
 
 ![image](./img/graphs/reward-graph.png)
@@ -99,12 +99,12 @@ After training the model for 20M timesteps, here are the resoults:
 
 ![image](./img/graphs/ep-length-graph.png)
 
-> Those are the configurations used during training.
+> Below are the hyperparameters used during training.
  ```json
  {  
      "agent": {  
-         "timestamps_per_batch": 4800,  
-         "max_timestamps_per_episode": 1600,  
+         "timesteps_per_batch": 4800,  
+         "max_timesteps_per_episode": 1600,  
          "gamma": 0.95,  
          "n_updates_per_iteration": 5,  
          "clip": 0.2,  
@@ -117,7 +117,7 @@ After training the model for 20M timesteps, here are the resoults:
              10,  
              10  
          ],  
-         "action_shape": [ 4 ]  
+         "action_shape": [4]  
      }  
  }
  ```
@@ -131,16 +131,16 @@ After training the model for 20M timesteps, here are the resoults:
 <br>
 
 **`train.py`**: the script where you can train the model.  
-*(If you wonna make another training script, you can simply use `model.learn(timesteps)`)*  
+*(If you want to make another training script, you can simply use `model.learn(timesteps)`)*  
 Params:  
 ```py
---train-ts 20_000_000  # Number of timestamps the model will be trained for
+--train-ts 20_000_000  # Number of timesteps to train the model
 ```
 ```py
---ci 50_000  # Number of steps between checkpoint saves
+--ci 50_000  # Number of timesteps between checkpoint saves
 ```
 ```py
---vf 500  # Number of steps after wich the agent will be playing a live game, to see how it's doing
+--vf 500  # Number of timesteps between live evaluation runs, to see how it's doing
 ```
 
 <br>
@@ -150,10 +150,10 @@ Params:
 **`play.py`**: the script where you can test the trained model once training is completed.  
 Params:  
 ```py
---path "agent\pretrained_model.pth"  # Path to the model file (file name included). It can be both absolute or relative to project's root folder
+--path "agent\pretrained_model.pth"  # Path to the model file (file name included). It can be either absolute or relative to the project root directory
 ```
 ```py
---disable-gui  # No value needed, deactivates the gui on the environment (it will use the cli)
+--disable-gui  # No value needed, disables the GUI and runs the environment in CLI mode
 ```
 
 <br>
@@ -165,18 +165,18 @@ Params:
 
 ---
 
-**`debug/`**: the folder where deug scripts are kept.  
+**`debug/`**: the folder where debug scripts are kept.  
 > [!NOTE]
-> The scripts inside this folder needs to be runned as a module:
+> The scripts inside this folder needs to be run as a module:
 > ```ps
 > py -m debug.script_name
 > ```
 
-  * **`test_ppo_agent.py`**: script made to test if the ppoAgent is able to learn using cartpole env *(not working since the model was adapted for a discrtete action space)*
-  * **`test_snake_env.py`**: script made to test if an agent can learn from the env *(to test if the env works)* making stable baseline 3 try to learn snake
-  * **`test_snake_gui.py`**: script made to thest the env gui
-  * **`test_snake_logic.py`**: script made to play snake on the cli to test if the logic is correct and make sure there aren't any bugs 
-  * **`test_snake_reward_system.py`**: script made to play snake and have a feedback of the reward recived for every move *(important to test the reward and avoid reward hacking from the agent)*
+  * **`test_ppo_agent.py`**: Script to test whether the PPOAgent can learn on the CartPole environment *(not working since the model was adapted for a discrete action space)*
+  * **`test_snake_env.py`**: script to test if an agent can learn from the env *(to test if the env works)* using Stable-Baselines3 to verify learnability of the Snake environment
+  * **`test_snake_gui.py`**: script to test the env gui
+  * **`test_snake_logic.py`**: script to play snake on the cli to test if the logic is correct and make sure there aren't any bugs 
+  * **`test_snake_reward_system.py`**: script to play snake and have a feedback of the reward received for every move *(important to test the reward and avoid reward hacking from the agent)*
 
 
 
@@ -184,11 +184,11 @@ Params:
 <br>
 
 # 🤝 Credits
-Special thanks to [Eric Yang Yu](https://ericyangyu.github.io/) for the [PPO tutorial](https://medium.com/analytics-vidhya/coding-ppo-from-scratch-with-pytorch-part-1-4-613dfc1b14c8) and [Ettore](https://sa1g.github.io) for helping me with the project structure and debugging.
+Special thanks to [Eric Yang Yu](https://ericyangyu.github.io/) for his [PPO tutorial](https://medium.com/analytics-vidhya/coding-ppo-from-scratch-with-pytorch-part-1-4-613dfc1b14c8) and [Ettore](https://sa1g.github.io) for structural guidance and debugging support.
 
 
 <br>
 <br>
 
-# 📄 Licence
+# 📄 License
 This project was released under [MIT License](https://github.com/paolomalgarin/snake-ppo/blob/main/LICENSE.txt).
