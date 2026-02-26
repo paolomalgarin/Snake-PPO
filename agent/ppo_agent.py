@@ -207,7 +207,9 @@ class PPOAgent:
         # Return the data of the batch 
         return batch_obs, batch_acts, batch_log_probs, batch_rtgs, batch_rews, batch_lens
 
-    def get_action(self, obs):
+    def get_action(self, obs, deterministic=False):
+        # N.B: deterministic is a flag to use (set true) when wanting to choose always the best action the model thinks there is (during play or evaluation)
+
         # Convert to tensor
         if isinstance(obs, np.ndarray):
             obs = torch.tensor(obs, dtype=torch.float32)
@@ -222,9 +224,14 @@ class PPOAgent:
         # Create a Categorical Distribution
         dist = Categorical(logits=mean)
         
-        # Sample an action from the distribution and get its log prob
-        action = dist.sample()
-        log_prob = dist.log_prob(action)
+
+        if deterministic:
+            action = torch.argmax(mean, dim=-1)
+            log_prob = dist.log_prob(action)
+        else:
+            # Sample an action from the distribution and get its log prob
+            action = dist.sample()
+            log_prob = dist.log_prob(action)
 
         # Return the sampled action and the log prob of that action
         # Note that I'm calling detach() since the action and log_prob  
