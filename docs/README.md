@@ -167,13 +167,16 @@ Params:
 
 **`debug/`**: the folder where deug scripts are kept.  
 > [!NOTE]
-> The scripts inside this folder needs to be unned as a module:
-> ```py
-> py -m debug/script.py
+> The scripts inside this folder needs to be runned as a module:
+> ```ps
+> py -m debug.script_name
 > ```
 
-  * **`test_ppo_agent.py`**: script made to test if the ppoAgent is able to learn using cartpole env (not working since the model was adapted for a discrtete action space)
-  * **`test_snake_env.py`**: ...
+  * **`test_ppo_agent.py`**: script made to test if the ppoAgent is able to learn using cartpole env *(not working since the model was adapted for a discrtete action space)*
+  * **`test_snake_env.py`**: script made to test if an agent can learn from the env *(to test if the env works)* making stable baseline 3 try to learn snake
+  * **`test_snake_gui.py`**: script made to thest the env gui
+  * **`test_snake_logic.py`**: script made to play snake on the cli to test if the logic is correct and make sure there aren't any bugs 
+  * **`test_snake_reward_system.py`**: script made to play snake and have a feedback of the reward recived for every move *(important to test the reward and avoid reward hacking from the agent)*
 
 
 
@@ -181,7 +184,7 @@ Params:
 <br>
 
 # 🤝 Credits
-Special thanks to [Eric Yang Yu](https://ericyangyu.github.io/) for the [PPO tutorial](https://medium.com/analytics-vidhya/coding-ppo-from-scratch-with-pytorch-part-1-4-613dfc1b14c8) and [Ettore](https://sa1g.github.io) for helping me with debugging.
+Special thanks to [Eric Yang Yu](https://ericyangyu.github.io/) for the [PPO tutorial](https://medium.com/analytics-vidhya/coding-ppo-from-scratch-with-pytorch-part-1-4-613dfc1b14c8) and [Ettore](https://sa1g.github.io) for helping me with the project structure and debugging.
 
 
 <br>
