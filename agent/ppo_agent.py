@@ -140,6 +140,9 @@ class PPOAgent:
         
         pbar.close()
 
+        # return the specific number of timesteps the model was trained for (not necessary for the project)
+        return t_so_far
+
 
     def _init_hyperparameters(self):
         # Default values for hyperparameters

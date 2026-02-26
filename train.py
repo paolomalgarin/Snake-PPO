@@ -13,10 +13,10 @@ VISUALIZE_FREQUENCY = 500_000  # Number of steps after wich the agent will be pl
 
 if __name__ == "__main__":
     # Make the dirs to save training data
-    os.makedirs(os.path.join('resoults', 'config'), exist_ok=True)
-    os.makedirs(os.path.join('resoults', 'logs'), exist_ok=True)
-    os.makedirs(os.path.join('resoults', 'checkpoints'), exist_ok=True)
-    os.makedirs(os.path.join('resoults', 'model'), exist_ok=True)
+    os.makedirs(os.path.join('results', 'config'), exist_ok=True)
+    os.makedirs(os.path.join('results', 'logs'), exist_ok=True)
+    os.makedirs(os.path.join('results', 'checkpoints'), exist_ok=True)
+    os.makedirs(os.path.join('results', 'model'), exist_ok=True)
 
 
     # Handle params
@@ -57,12 +57,12 @@ if __name__ == "__main__":
         },
     }
 
-    with open(os.path.join('resoults', 'config', 'training_config.json'), 'w') as f:
+    with open(os.path.join('results', 'config', 'training_config.json'), 'w') as f:
         json.dump(config, f, indent=4)
 
 
     # Initialize pointer to file where the stats for each batch will be saved
-    training_logs_file = open(os.path.join('resoults', 'logs', 'training_logs.json'), 'w')
+    training_logs_file = open(os.path.join('results', 'logs', 'training_logs.json'), 'w')
     training_logs_file.write('[\n')
     training_logs_first_entry = True  # Used to manage commas inside the json
 
@@ -83,7 +83,7 @@ if __name__ == "__main__":
         t_so_far += total_batch_steps
         pbar.update(total_batch_steps)
 
-        # Display batch resoults
+        # Display batch results
         agent._print_stats(total_batch_steps, batch_rews, batch_lens, batch_n)
 
 
@@ -152,7 +152,7 @@ if __name__ == "__main__":
         # =============== SAVE CHECKPOINT ===============
         if t_so_far % CHECKPOINT_INTERVAL < total_batch_steps and t_so_far != TRAINING_TIMESTEPS:
             clean_checkpoint_number = int(t_so_far / CHECKPOINT_INTERVAL) * CHECKPOINT_INTERVAL
-            agent.save(total_timesteps=t_so_far, path=os.path.join('resoults', 'checkpoints'), file_name=f'checkpoint_{clean_checkpoint_number:,}.pth')
+            agent.save(total_timesteps=t_so_far, path=os.path.join('results', 'checkpoints'), file_name=f'checkpoint_{clean_checkpoint_number:,}.pth')
         
         # =============== VISUALIZE GAME ===============
         # N.B.: This visualize also the first batch to show the starting point (to avoid it delete 'or t_so_far == total_batch_steps')
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 env.render()
                 time.sleep(0.2)
 
-            # Visualize resoults
+            # Visualize results
             score = info['score']
             steps = info['steps']
             

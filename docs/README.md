@@ -38,7 +38,7 @@ The main goal was to train a reinforcement learning agent capable of learning th
 Along the way, this project became a deep dive into PPO: understanding how it works, tuning hyperparameters, stabilizing training, and analyzing learning behavior through metrics. 
 
 > Here is a gameplay demo of the final agent trained for 20M timesteps  
-> (You can find the model in `/agent/pretrained_model.pth`)
+> (You can find the model in `/agent/pretrained_models/20M_timesteps.pth`)
 
 <p align=center>
    <img src="./img/gameplays/game3.gif" alt='gameplay'>
@@ -150,7 +150,7 @@ Params:
 **`play.py`**: the script where you can test the trained model once training is completed.  
 Params:  
 ```py
---path "agent\pretrained_model.pth"  # Path to the model file (file name included). It can be either absolute or relative to the project root directory
+--path "agent\pretrained_models\20M_timesteps.pth"  # Path to the model file (file name included). It can be either absolute or relative to the project root directory
 ```
 ```py
 --disable-gui  # No value needed, disables the GUI and runs the environment in CLI mode

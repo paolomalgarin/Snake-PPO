@@ -4,7 +4,7 @@ import json, os
 
 if __name__ == '__main__':
     # Create paths
-    training_logs_path = os.path.join('resoults', 'logs', 'training_logs.json')
+    training_logs_path = os.path.join('results', 'logs', 'training_logs.json')
 
     # Check file existance
     if not os.path.exists(training_logs_path):
