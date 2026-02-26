@@ -163,6 +163,18 @@ Params:
 **`plot.py`**: the script where you can plot the data collected automatically from training.  
 *(no params)*
 
+---
+
+**`debug/`**: the folder where deug scripts are kept.  
+> [!NOTE]
+> The scripts inside this folder needs to be unned as a module:
+> ```py
+> py -m debug/script.py
+> ```
+
+  * **`test_ppo_agent.py`**: script made to test if the ppoAgent is able to learn using cartpole env (not working since the model was adapted for a discrtete action space)
+  * **`test_snake_env.py`**: ...
+
 
 
 <br>
