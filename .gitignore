@@ -1,4 +1,5 @@
 __pycache__/
 .venv/
 debug/sb3_logs/
+resoults/
 results/

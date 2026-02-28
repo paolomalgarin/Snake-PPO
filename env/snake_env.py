@@ -86,7 +86,8 @@ class SnakeEnv(Env):
                 if currentPoint == self.game.head:
                     grid[0][row][col] = 1.0
                 elif currentPoint in self.game.body:
-                    grid[1][row][col] = 1.0
+                    idx = self.game.body.index(currentPoint)
+                    grid[1][row][col] = 1.0 + idx
                 elif currentPoint == self.game.food:
                     grid[2][row][col] = 1.0
 

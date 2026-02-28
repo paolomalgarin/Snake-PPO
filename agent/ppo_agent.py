@@ -39,9 +39,9 @@ class FeedForwardNN(nn.Module):
         x = self.relu(x)
         x = self.pool(x)
 
-        x = self.conv3(x)
-        x = self.relu(x)
-        x = self.pool(x)
+        # x = self.conv3(x)
+        # x = self.relu(x)
+        # x = self.pool(x)
 
         x = self.adaptive_pool(x)
         x = x.view(x.size(0), -1)
