@@ -39,9 +39,9 @@ class FeedForwardNN(nn.Module):
         x = self.relu(x)
         x = self.pool(x)
 
-        # x = self.conv3(x)
-        # x = self.relu(x)
-        # x = self.pool(x)
+        x = self.conv3(x)
+        x = self.relu(x)
+        x = self.pool(x)
 
         x = self.adaptive_pool(x)
         x = x.view(x.size(0), -1)
@@ -275,7 +275,7 @@ class PPOAgent:
         # Return predicted values V and log probs log_probs
         return V, log_probs
     
-    def save(self, total_timesteps = None, path = os.path.join('resoults', 'model'), file_name = 'final_mnodel.pth'):
+    def save(self, total_timesteps = None, path = os.path.join('results', 'model'), file_name = 'final_mnodel.pth'):
         saving_path = os.path.join(path, file_name)
 
         # Create folders if not exists
