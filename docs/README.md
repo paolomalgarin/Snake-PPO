@@ -106,7 +106,9 @@ After training the model for 20M timesteps, here are the results:
 
 <br>
 
-<img src="./img/graphs/grid-size-6/score-graph.png" width=80% align=center>
+<p style="display: flex; justify-content: center; width: 100%;">
+  <img src="./img/graphs/grid-size-6/score-graph.png" width=80%>
+</p>
 
 > This is the score graph *(of the 6x6 snake)*, which shows the model score during training.  
 
