@@ -53,6 +53,7 @@ Along the way, this project became a deep dive into PPO: understanding how it wo
 
 <br>
 <br>
+<br>
 
 # 🌐 Model Structure
 
@@ -75,6 +76,7 @@ This reward shaping might seem too sparse for PPO, but out of all the rewards sh
 
 <br>
 <br>
+<br>
 
 # 👀 Model Input
 
@@ -92,6 +94,7 @@ Before being passed to the network, the observation is batched to shape (N, 4, g
 
 <br>
 <br>
+<br>
 
 # 🎖️ Results
 
@@ -106,8 +109,8 @@ After training the model for 20M timesteps, here are the results:
 
 <br>
 
-<p style="display: flex; justify-content: center; width: 100%;">
-  <img src="./img/graphs/grid-size-6/score-graph.png" width=80%>
+<p style="display: flex; justify-content: center; width: 100%;" align=center>
+  <img src="./img/graphs/grid-size-6/score-graph.png">
 </p>
 
 > This is the score graph *(of the 6x6 snake)*, which shows the model score during training.  
@@ -157,6 +160,7 @@ py play.py --grid-size 10 --path "agent/pretrained_models/size_10/20M_timesteps.
 Special thanks to [Eric Yang Yu](https://ericyangyu.github.io/) for his [PPO tutorial](https://medium.com/analytics-vidhya/coding-ppo-from-scratch-with-pytorch-part-1-4-613dfc1b14c8) and [Ettore](https://sa1g.github.io) for structural guidance and debugging support.
 
 
+<br>
 <br>
 <br>
 
